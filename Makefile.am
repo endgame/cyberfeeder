@@ -5,4 +5,7 @@ LDADD = $(GTK3_LIBS)
 
 bin_PROGRAMS = cyberfeeder
 
-cyberfeeder_SOURCES = src/cyberfeeder.c
+cyberfeeder_SOURCES = \
+	src/card.c \
+	src/card.h \
+	src/cyberfeeder.c
