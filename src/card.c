@@ -29,7 +29,7 @@ struct card* card_new(enum faction faction,
                       gboolean unique,
                       const gchar *name,
                       const gchar *text,
-                      const gchar *flavor_text,
+                      const gchar *flavor,
                       const gchar *illustrator) {
   g_assert(type != NULL);
   g_assert(set != NULL);
@@ -74,7 +74,7 @@ struct card* card_new(enum faction faction,
   card->unique = unique;
   card->name = g_strdup(name);
   card->text = g_strdup(text);
-  card->flavor_text = g_strdup(flavor_text);
+  card->flavor = g_strdup(flavor);
   card->illustrator = g_strdup(illustrator);
   return card;
 }
@@ -199,7 +199,7 @@ void card_free(struct card *card) {
   g_free(card->type_str);
   g_free(card->name);
   g_free(card->text);
-  g_free(card->flavor_text);
+  g_free(card->flavor);
   g_free(card->illustrator);
   g_free(card);
 }

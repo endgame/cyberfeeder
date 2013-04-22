@@ -64,17 +64,17 @@ static struct card* load_card(json_t *j_card, const char *set_name) {
     unique = json_is_true(j_unique);
   }
 
-  json_t *j_title = json_object_get(j_card, "title");
-  g_assert(json_is_string(j_title));
+  json_t *j_name = json_object_get(j_card, "name");
+  g_assert(json_is_string(j_name));
 
   json_t *j_text = json_object_get(j_card, "text");
   g_assert(json_is_string(j_text));
 
-  json_t *j_flavor_text = json_object_get(j_card, "flavor_text");
-  const char *flavor_text = NULL;
-  if (j_flavor_text != NULL) {
-    g_assert(json_is_string(j_flavor_text));
-    flavor_text = json_string_value(j_flavor_text);
+  json_t *j_flavor = json_object_get(j_card, "flavor");
+  const char *flavor = NULL;
+  if (j_flavor != NULL) {
+    g_assert(json_is_string(j_flavor));
+    flavor = json_string_value(j_flavor);
   }
 
   json_t *j_illustrator = json_object_get(j_card, "illustrator");
@@ -86,9 +86,9 @@ static struct card* load_card(json_t *j_card, const char *set_name) {
                                json_integer_value(j_number),
                                json_integer_value(j_quantity),
                                unique,
-                               json_string_value(j_title),
+                               json_string_value(j_name),
                                json_string_value(j_text),
-                               flavor_text,
+                               flavor,
                                json_string_value(j_illustrator));
 
   g_debug("Loaded card: %s", card->name);

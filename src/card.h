@@ -60,7 +60,7 @@ struct card {
   gboolean unique; /* e.g., Ice Carver */
   gchar *name;
   gchar *text;
-  gchar *flavor_text; /* May be NULL */
+  gchar *flavor; /* May be NULL */
   gchar *illustrator;
 
   gint8 cost; /* Rez cost for assets/upgrades/ice; advance cost for agendas */
@@ -85,7 +85,7 @@ struct card* card_new(enum faction faction,
                       gboolean unique,
                       const gchar *name,
                       const gchar *text,
-                      const gchar *flavor_text,
+                      const gchar *flavor,
                       const gchar *illustrator);
 
 struct card* card_fill_runnner_id(struct card *card,
