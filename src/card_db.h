@@ -15,25 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
+#ifndef CARD_DB_H
+#define CARD_DB_H
+
+#include <glib.h>
+#include <string.h>
+
+struct card_db {
+  GList* /* of struct card*, owned */ cards;
+};
+
+struct card_db* card_db_new(void);
+void card_db_free(struct card_db *db);
+
+void card_db_load_file(struct card_db *db, const gchar *path);
+
 #endif
-
-#include <gtk/gtk.h>
-
-#include "card_db.h"
-
-int main(int argc, char *argv[]) {
-  gtk_init(&argc, &argv);
-
-  struct card_db* db = card_db_new();
-  card_db_load_file(db, "data/00_Core.json");
-  card_db_free(db);
-
-  GtkWidget* window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title(GTK_WINDOW(window), "Cyberfeeder");
-  g_signal_connect (window, "destroy", G_CALLBACK (gtk_main_quit), NULL);
-  gtk_widget_show(window);
-  gtk_main();
-  return 0;
-}

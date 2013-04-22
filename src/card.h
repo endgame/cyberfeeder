@@ -30,7 +30,7 @@ enum faction {
   CORP_JINTEKI,
   CORP_NBN,
   CORP_WEYLAND,
-  CORP_NEUTRAL
+  CORP_NEUTRAL,
 };
 
 enum card_type {
@@ -52,16 +52,16 @@ enum card_type {
 struct card {
   enum faction faction;
   enum card_type type;
-  gchar* type_str;
+  gchar *type_str;
 
-  const gchar* set; /* Not owned. Held by struct card_db */
+  const gchar *set; /* Not owned. Held by struct card_db */
   gint8 number; /* Noise = 1, Deja Vu = 2, ... */
   gint8 quantity; /* == 3, except for certain Core cards */
   gboolean unique; /* e.g., Ice Carver */
-  gchar* title;
-  gchar* text;
-  gchar* flavor_text; /* May be NULL */
-  gchar* illustrator;
+  gchar *name;
+  gchar *text;
+  gchar *flavor_text; /* May be NULL */
+  gchar *illustrator;
 
   gint8 cost; /* Rez cost for assets/upgrades/ice; advance cost for agendas */
   gint8 agenda_points; /* Agendas only */
@@ -78,53 +78,53 @@ struct card {
    sets the common parameters of the card, then one of the card_fill_*
    functions fills in the remaining fields. */
 struct card* card_new(enum faction faction,
-                      const gchar* type,
-                      const gchar* set,
+                      const gchar *type,
+                      const gchar *set,
                       gint8 number,
                       gint8 quantity,
                       gboolean unique,
-                      const gchar* title,
-                      const gchar* text,
-                      const gchar* flavor_text,
-                      const gchar* illustrator);
+                      const gchar *name,
+                      const gchar *text,
+                      const gchar *flavor_text,
+                      const gchar *illustrator);
 
-struct card* card_fill_runnner_id(struct card* card,
+struct card* card_fill_runnner_id(struct card *card,
                                   gint8 min_decksize,
                                   gint8 max_influence,
                                   gint8 base_link);
 /* For events, hardware, resources and operations. */
-struct card* card_fill_costed(struct card* card,
+struct card* card_fill_costed(struct card *card,
                               gint8 cost,
                               gint8 influence_cost);
-struct card* card_fill_program(struct card* card,
+struct card* card_fill_program(struct card *card,
                                gint8 cost,
                                gint8 influence_cost,
                                gint8 memory_cost);
-struct card* card_fill_icebreaker(struct card* card,
+struct card* card_fill_icebreaker(struct card *card,
                                   gint8 cost,
                                   gint8 influence_cost,
                                   gint8 memory_cost,
                                   gint8 strength);
-struct card* card_fill_corp_id(struct card* card,
+struct card* card_fill_corp_id(struct card *card,
                                gint8 min_decksize,
                                gint8 max_influence);
-struct card* card_fill_agenda(struct card* card,
+struct card* card_fill_agenda(struct card *card,
                               gint8 cost,
                               gint8 agenda_points);
-struct card* card_fill_asset_upgrade(struct card* card,
+struct card* card_fill_asset_upgrade(struct card *card,
                                      gint8 cost,
                                      gint8 influence_cost,
                                      gint8 trash_cost);
-struct card* card_fill_ice(struct card* card,
+struct card* card_fill_ice(struct card *card,
                            gint8 cost,
                            gint8 influence_cost,
                            gint8 strength);
 
-void card_free(struct card* card);
+void card_free(struct card *card);
 
 /* These test on the card's faction */
-gboolean card_is_runner(const struct card* card);
-gboolean card_is_corp(const struct card* card);
-gboolean card_is_neutral(const struct card* card);
+gboolean card_is_runner(const struct card *card);
+gboolean card_is_corp(const struct card *card);
+gboolean card_is_neutral(const struct card *card);
 
 #endif

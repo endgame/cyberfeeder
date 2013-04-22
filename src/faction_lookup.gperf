@@ -15,25 +15,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+%{
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 
-#include <gtk/gtk.h>
+#include "card.h"
 
-#include "card_db.h"
-
-int main(int argc, char *argv[]) {
-  gtk_init(&argc, &argv);
-
-  struct card_db* db = card_db_new();
-  card_db_load_file(db, "data/00_Core.json");
-  card_db_free(db);
-
-  GtkWidget* window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title(GTK_WINDOW(window), "Cyberfeeder");
-  g_signal_connect (window, "destroy", G_CALLBACK (gtk_main_quit), NULL);
-  gtk_widget_show(window);
-  gtk_main();
-  return 0;
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
+%}
+%struct-type
+%ignore-case
+%includes
+%define hash-function-name faction_lookup_hash
+%define lookup-function-name faction_lookup_in_word_set
+struct entry { const char* name; enum faction value; };
+%%
+anarch,          RUNNER_ANARCH
+criminal,        RUNNER_CRIMINAL
+shaper,          RUNNER_SHAPER
+runner_neutral,  RUNNER_NEUTRAL
+haas-bioroid,    CORP_HAAS_BIOROID
+jinteki,         CORP_JINTEKI
+nbn,             CORP_NBN
+weyland,         CORP_WEYLAND
+corp_neutral,    CORP_NEUTRAL
+%%
+gboolean faction_lookup(const char *name, enum faction *result) {
+  struct entry *faction = faction_lookup_in_word_set(name, strlen(name));
+  if (faction == NULL) return FALSE;
+  *result = faction->value;
+  return TRUE;
 }

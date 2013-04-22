@@ -22,24 +22,24 @@
 #include "card.h"
 
 struct card* card_new(enum faction faction,
-                      const gchar* type,
-                      const gchar* set,
+                      const gchar *type,
+                      const gchar *set,
                       gint8 number,
                       gint8 quantity,
                       gboolean unique,
-                      const gchar* title,
-                      const gchar* text,
-                      const gchar* flavor_text,
-                      const gchar* illustrator) {
+                      const gchar *name,
+                      const gchar *text,
+                      const gchar *flavor_text,
+                      const gchar *illustrator) {
   g_assert(type != NULL);
   g_assert(set != NULL);
   g_assert(number > 0);
   g_assert(quantity > 0);
-  g_assert(title != NULL);
+  g_assert(name != NULL);
   g_assert(text != NULL);
   g_assert(illustrator != NULL);
 
-  struct card* card = g_new(struct card, 1);
+  struct card *card = g_new(struct card, 1);
   card->faction = faction;
 
   if (g_str_has_prefix(type, "Identity"))
@@ -72,14 +72,14 @@ struct card* card_new(enum faction faction,
   card->number = number;
   card->quantity = quantity;
   card->unique = unique;
-  card->title = g_strdup(title);
+  card->name = g_strdup(name);
   card->text = g_strdup(text);
   card->flavor_text = g_strdup(flavor_text);
   card->illustrator = g_strdup(illustrator);
   return card;
 }
 
-static struct card* card_fill_id(struct card* card,
+static struct card* card_fill_id(struct card *card,
                                  gint8 min_decksize,
                                  gint8 max_influence) {
   g_assert(card->type == RUNNER_ID || card->type == CORP_ID);
@@ -92,7 +92,7 @@ static struct card* card_fill_id(struct card* card,
   return card;
 }
 
-struct card* card_fill_runnner_id(struct card* card,
+struct card* card_fill_runnner_id(struct card *card,
                                   gint8 min_decksize,
                                   gint8 max_influence,
                                   gint8 base_link) {
@@ -104,7 +104,7 @@ struct card* card_fill_runnner_id(struct card* card,
   return card_fill_id(card, min_decksize, max_influence);
 }
 
-struct card* card_fill_costed(struct card* card,
+struct card* card_fill_costed(struct card *card,
                               gint8 cost,
                               gint8 influence_cost) {
   g_assert((card_is_runner(card) && (card->type == RUNNER_EVENT
@@ -124,7 +124,7 @@ struct card* card_fill_costed(struct card* card,
   return card;
 }
 
-struct card* card_fill_program(struct card* card,
+struct card* card_fill_program(struct card *card,
                                gint8 cost,
                                gint8 influence_cost,
                                gint8 memory_cost) {
@@ -137,7 +137,7 @@ struct card* card_fill_program(struct card* card,
   return card_fill_costed(card, cost, influence_cost);
 }
 
-struct card* card_fill_icebreaker(struct card* card,
+struct card* card_fill_icebreaker(struct card *card,
                                   gint8 cost,
                                   gint8 influence_cost,
                                   gint8 memory_cost,
@@ -149,7 +149,7 @@ struct card* card_fill_icebreaker(struct card* card,
   return card_fill_program(card, cost, influence_cost, memory_cost);
 }
 
-struct card* card_fill_corp_id(struct card* card,
+struct card* card_fill_corp_id(struct card *card,
                                gint8 min_decksize,
                                gint8 max_influence) {
   g_assert(card_is_corp(card));
@@ -158,7 +158,7 @@ struct card* card_fill_corp_id(struct card* card,
   return card_fill_id(card, min_decksize, max_influence);
 }
 
-struct card* card_fill_agenda(struct card* card,
+struct card* card_fill_agenda(struct card *card,
                               gint8 cost,
                               gint8 agenda_points) {
   g_assert(card_is_corp(card));
@@ -171,7 +171,7 @@ struct card* card_fill_agenda(struct card* card,
   return card;
 }
 
-struct card* card_fill_asset_upgrade(struct card* card,
+struct card* card_fill_asset_upgrade(struct card *card,
                                      gint8 cost,
                                      gint8 influence_cost,
                                      gint8 trash_cost) {
@@ -183,7 +183,7 @@ struct card* card_fill_asset_upgrade(struct card* card,
   return card_fill_costed(card, cost, influence_cost);
 }
 
-struct card* card_fill_ice(struct card* card,
+struct card* card_fill_ice(struct card *card,
                            gint8 cost,
                            gint8 influence_cost,
                            gint8 strength) {
@@ -194,24 +194,24 @@ struct card* card_fill_ice(struct card* card,
   return card_fill_costed(card, cost, influence_cost);
 }
 
-void card_free(struct card* card) {
+void card_free(struct card *card) {
   if (card == NULL) return;
   g_free(card->type_str);
-  g_free(card->title);
+  g_free(card->name);
   g_free(card->text);
   g_free(card->flavor_text);
   g_free(card->illustrator);
   g_free(card);
 }
 
-gboolean card_is_runner(const struct card* card) {
+gboolean card_is_runner(const struct card *card) {
   return (card->faction == RUNNER_ANARCH
           || card->faction == RUNNER_CRIMINAL
           || card->faction == RUNNER_SHAPER
           || card->faction == RUNNER_NEUTRAL);
 }
 
-gboolean card_is_corp(const struct card* card) {
+gboolean card_is_corp(const struct card *card) {
   return (card->faction == CORP_HAAS_BIOROID
           || card->faction == CORP_JINTEKI
           || card->faction == CORP_NBN
@@ -219,7 +219,7 @@ gboolean card_is_corp(const struct card* card) {
           || card->faction == CORP_NEUTRAL);
 }
 
-gboolean card_is_neutral(const struct card* card) {
+gboolean card_is_neutral(const struct card *card) {
   return (card->faction == RUNNER_NEUTRAL
           || card->faction == CORP_NEUTRAL);
 }

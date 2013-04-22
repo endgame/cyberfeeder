@@ -1,0 +1,18 @@
+{"name": "Core",
+ "cards": [
+     {"faction": "anarch",
+      "type": "Identity: G-mod",
+      "number": 1,
+      "quantity": 1,
+      "title": "Noise: Hacker Extraordinaire",
+      "text": "Whenever you install a virus program, the Corp trashes the top card of R&D.",
+      "flavor_text": "Watch this. It'll be funny.",
+      "illustrator": "Ralph Beisner"},
+     {"faction": "anarch",
+      "type": "Event",
+      "number": 2,
+      "quantity": 2,
+      "title": "Deja Vu",
+      "text": "Add 1 card (or up to 2 virus cards) from your heap to your grip.",
+      "flavor_text": "Anything worth doing is worth doing twice.",
+      "illustrator": "Tim Durning"}]}
