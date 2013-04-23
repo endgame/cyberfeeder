@@ -39,9 +39,70 @@ void card_db_free(struct card_db *db) {
   g_free(db);
 }
 
+static struct card* fill_card(struct card *card, json_t *j_card) {
+  gint8 agenda_points, base_link, cost, influence_cost, max_influence,
+    memory_cost, min_decksize, strength, trash_cost;
+  const struct {
+    const char *field;
+    gint8 *p_int;
+    gboolean (*predicate)(const struct card*);
+  } *p, field_table[] = {
+    { "agenda_points" , &agenda_points , card_has_agenda_points  },
+    { "base_link"     , &base_link     , card_has_base_link      },
+    { "cost"          , &cost          , card_has_cost           },
+    { "influence_cost", &influence_cost, card_has_influence_cost },
+    { "max_influence" , &max_influence , card_has_max_influence  },
+    { "memory_cost"   , &memory_cost   , card_has_memory_cost    },
+    { "min_decksize"  , &min_decksize  , card_has_min_decksize   },
+    { "strength"      , &strength      , card_has_strength       },
+    { "trash_cost"    , &trash_cost    , card_has_trash_cost     },
+    { NULL            , NULL           , NULL                    }
+  };
+
+  // TODO: something better than g_assert().
+  for (p = field_table; p->field != NULL; p++) {
+    if (!p->predicate(card)) continue;
+    json_t *json_obj = json_object_get(j_card, p->field);
+    g_assert(json_is_integer(json_obj));
+    *p->p_int = json_integer_value(json_obj);
+  }
+
+  switch (card->type) {
+  case RUNNER_ID:
+    return card_fill_runner_id
+      (card, min_decksize, max_influence, base_link);
+  case RUNNER_EVENT:
+  case RUNNER_HARDWARE:
+  case RUNNER_RESOURCE:
+  case CORP_OPERATION:
+    return card_fill_costed
+      (card, cost, influence_cost);
+  case RUNNER_PROGRAM:
+    return card_fill_program
+      (card, cost, influence_cost, memory_cost);
+  case RUNNER_ICEBREAKER:
+    return card_fill_icebreaker
+      (card, cost, influence_cost, memory_cost, strength);
+  case CORP_ID:
+    return card_fill_corp_id
+      (card, min_decksize, max_influence);
+  case CORP_AGENDA:
+    return card_fill_agenda
+      (card, cost, agenda_points);
+  case CORP_ASSET:
+  case CORP_UPGRADE:
+    return card_fill_asset_upgrade
+      (card, cost, influence_cost, trash_cost);
+  case CORP_ICE:
+    return card_fill_ice
+      (card, cost, influence_cost, strength);
+  }
+  g_assert_not_reached();
+}
+
 static struct card* load_card(json_t *j_card, const char *set_name) {
   json_t *j_faction = json_object_get(j_card, "faction");
-  // TODO: something better than this.
+  // TODO: something better than g_assert().
   g_assert(json_is_string(j_faction));
   const char *str_faction = json_string_value(j_faction);
   enum faction faction;
@@ -91,15 +152,14 @@ static struct card* load_card(json_t *j_card, const char *set_name) {
                                flavor,
                                json_string_value(j_illustrator));
 
-  g_debug("Loaded card: %s", card->name);
-  return card;
+  return fill_card(card, j_card);
 }
 
 void card_db_load_file(struct card_db *db, const gchar *path) {
   json_error_t err;
   json_t *j_set = json_load_file(path, 0, &err);
   if(!json_is_object(j_set)) puts(err.text);
-  // TODO: something better than this.
+  // TODO: something better than g_assert().
   g_assert(json_is_object(j_set));
 
   json_t *j_set_name = json_object_get(j_set, "name");
@@ -118,6 +178,7 @@ void card_db_load_file(struct card_db *db, const gchar *path) {
     // TODO, XXX: this will leave card pointing to unitialised memory!
     // TODO, XXX: Fix it ASAP by adding card sets to card_db!
     struct card *card = load_card(j_card, set_name);
+    g_debug("Loaded card: %s", card->name);
     cards = g_list_prepend(cards, card);
   }
 

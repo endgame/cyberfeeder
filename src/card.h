@@ -88,10 +88,10 @@ struct card* card_new(enum faction faction,
                       const gchar *flavor,
                       const gchar *illustrator);
 
-struct card* card_fill_runnner_id(struct card *card,
-                                  gint8 min_decksize,
-                                  gint8 max_influence,
-                                  gint8 base_link);
+struct card* card_fill_runner_id(struct card *card,
+                                 gint8 min_decksize,
+                                 gint8 max_influence,
+                                 gint8 base_link);
 /* For events, hardware, resources and operations. */
 struct card* card_fill_costed(struct card *card,
                               gint8 cost,
@@ -126,5 +126,16 @@ void card_free(struct card *card);
 gboolean card_is_runner(const struct card *card);
 gboolean card_is_corp(const struct card *card);
 gboolean card_is_neutral(const struct card *card);
+
+/* These test on the card's type */
+gboolean card_has_agenda_points(const struct card *card);
+gboolean card_has_base_link(const struct card *card);
+gboolean card_has_cost(const struct card *card);
+gboolean card_has_influence_cost(const struct card *card);
+gboolean card_has_max_influence(const struct card *card);
+gboolean card_has_memory_cost(const struct card *card);
+gboolean card_has_min_decksize(const struct card *card);
+gboolean card_has_strength(const struct card *card);
+gboolean card_has_trash_cost(const struct card *card);
 
 #endif

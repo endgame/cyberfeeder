@@ -5,6 +5,9 @@
       "quantity": 1,
       "faction": "anarch",
       "type": "Identity: G-mod",
+      "base_link": 0,
+      "min_decksize": 45,
+      "max_influence": 15,
       "text": "Whenever you install a virus program, the Corp trashes the top card of R&D.",
       "flavor": "Watch this. It'll be funny.",
       "illustrator": "Ralph Beisner"},
@@ -13,6 +16,8 @@
       "quantity": 2,
       "faction": "anarch",
       "type": "Event",
+      "cost": 2,
+      "influence_cost": 2,
       "text": "Add 1 card (or up to 2 virus cards) from your heap to your grip.",
       "flavor": "Anything worth doing is worth doing twice.",
       "illustrator": "Tim Durning"}]}

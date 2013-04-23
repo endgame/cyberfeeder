@@ -42,6 +42,9 @@ struct card* card_new(enum faction faction,
   struct card *card = g_new(struct card, 1);
   card->faction = faction;
 
+  // TODO: Replace with gperf hash using type_parts[0].
+  gchar** type_parts = g_strsplit(type, ":", 2);
+  g_strfreev(type_parts);
   if (g_str_has_prefix(type, "Identity"))
     card->type = (card_is_runner(card) ? RUNNER_ID : CORP_ID);
   else if (g_str_has_prefix(type, "Event"))
@@ -76,6 +79,16 @@ struct card* card_new(enum faction faction,
   card->text = g_strdup(text);
   card->flavor = g_strdup(flavor);
   card->illustrator = g_strdup(illustrator);
+
+  card->cost = -1;
+  card->agenda_points = -1;
+  card->influence_cost = -1;
+  card->trash_cost = -1;
+  card->memory_cost = -1;
+  card->strength = -1;
+  card->min_decksize = -1;
+  card->max_influence = -1;
+  card->base_link = -1;
   return card;
 }
 
@@ -92,10 +105,10 @@ static struct card* card_fill_id(struct card *card,
   return card;
 }
 
-struct card* card_fill_runnner_id(struct card *card,
-                                  gint8 min_decksize,
-                                  gint8 max_influence,
-                                  gint8 base_link) {
+struct card* card_fill_runner_id(struct card *card,
+                                 gint8 min_decksize,
+                                 gint8 max_influence,
+                                 gint8 base_link) {
   g_assert(card_is_runner(card));
   g_assert(card->type == RUNNER_ID);
   g_assert(base_link >= 0);
@@ -222,4 +235,48 @@ gboolean card_is_corp(const struct card *card) {
 gboolean card_is_neutral(const struct card *card) {
   return (card->faction == RUNNER_NEUTRAL
           || card->faction == CORP_NEUTRAL);
+}
+
+gboolean card_has_agenda_points(const struct card *card) {
+  return card->type == CORP_AGENDA;
+}
+
+gboolean card_has_base_link(const struct card *card) {
+  return card->type == RUNNER_ID;
+}
+
+gboolean card_has_cost(const struct card *card) {
+  return (card->type != RUNNER_ID
+          && card->type != CORP_ID);
+}
+
+gboolean card_has_influence_cost(const struct card *card) {
+  return (card->type != RUNNER_ID
+          && card->type != CORP_ID
+          && card->type != CORP_AGENDA);
+}
+
+gboolean card_has_max_influence(const struct card *card) {
+  return (card->type == RUNNER_ID
+          || card->type == CORP_ID);
+}
+
+gboolean card_has_memory_cost(const struct card *card) {
+  return (card->type == RUNNER_PROGRAM
+          || card->type == RUNNER_ICEBREAKER);
+}
+
+gboolean card_has_min_decksize(const struct card *card) {
+  return (card->type == RUNNER_ID
+          || card->type == CORP_ID);
+}
+
+gboolean card_has_strength(const struct card *card) {
+  return (card->type == RUNNER_ICEBREAKER
+          || card->type == CORP_ICE);
+}
+
+gboolean card_has_trash_cost(const struct card *card) {
+  return (card->type == CORP_ASSET
+          || card->type == CORP_UPGRADE);
 }
