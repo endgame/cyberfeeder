@@ -116,7 +116,11 @@ static struct card* load_card(json_t *j_card, const char *set_name) {
   g_assert(json_is_integer(j_number));
 
   json_t *j_quantity = json_object_get(j_card, "quantity");
-  g_assert(json_is_integer(j_quantity));
+  gint8 quantity = 3;
+  if (j_quantity != NULL) {
+    g_assert(json_is_integer(j_quantity));
+    quantity = json_integer_value(j_quantity);
+  }
 
   json_t *j_unique = json_object_get(j_card, "unique");
   gboolean unique = FALSE;
@@ -145,7 +149,7 @@ static struct card* load_card(json_t *j_card, const char *set_name) {
                                json_string_value(j_type),
                                set_name,
                                json_integer_value(j_number),
-                               json_integer_value(j_quantity),
+                               quantity,
                                unique,
                                json_string_value(j_name),
                                json_string_value(j_text),
