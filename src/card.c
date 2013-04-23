@@ -107,7 +107,11 @@ struct card* card_fill_costed(struct card *card,
                                       || card->type == CORP_OPERATION
                                       || card->type == CORP_ICE)));
   g_assert(cost >= 0);
-  g_assert(influence_cost == 0 || !card_is_neutral(card));
+  if (card_is_neutral(card)) {
+    g_assert(influence_cost == 0);
+  } else {
+    g_assert(influence_cost > 0);
+  }
 
   card->cost = cost;
   card->influence_cost = cost;
