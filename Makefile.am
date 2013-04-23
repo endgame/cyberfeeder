@@ -5,7 +5,7 @@ AM_CPPFLAGS = -I$(srcdir)/src
 LDADD = $(GTK3_LIBS) $(Jansson_LIBS)
 
 bin_PROGRAMS = cyberfeeder
-CLEANFILES = src/faction_lookup.c
+CLEANFILES = src/hash_card_type.c src/hash_faction_name.c
 EXTRA_DIST = data/00_Core.json
 
 cyberfeeder_SOURCES = \
@@ -14,8 +14,9 @@ cyberfeeder_SOURCES = \
 	src/card_db.c \
 	src/card_db.h \
 	src/cyberfeeder.c \
-	src/faction_lookup.gperf \
-	src/faction_lookup.h
+	src/hash.h \
+	src/hash_card_type.gperf \
+	src/hash_faction_name.gperf
 
 .gperf.c:
 	$(AM_V_GEN)$(GPERF) $< > $@

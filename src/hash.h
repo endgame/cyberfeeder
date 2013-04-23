@@ -15,11 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FACTION_LOOKUP_H
-#define FACTION_LOOKUP_H
+/* Static hash functions produced by gperf. */
+
+#ifndef HASH_H
+#define HASH_H
 
 #include "card.h"
 
-gboolean faction_lookup(const char *name, enum faction *result);
+gboolean hash_faction_name(const char *name, enum faction *result);
+gboolean hash_card_type(const char *type,
+                        enum faction faction,
+                        enum card_type *result);
 
 #endif

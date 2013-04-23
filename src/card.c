@@ -20,6 +20,7 @@
 #endif
 
 #include "card.h"
+#include "hash.h"
 
 struct card* card_new(enum faction faction,
                       const gchar *type,
@@ -42,33 +43,9 @@ struct card* card_new(enum faction faction,
   struct card *card = g_new(struct card, 1);
   card->faction = faction;
 
-  // TODO: Replace with gperf hash using type_parts[0].
-  gchar** type_parts = g_strsplit(type, ":", 2);
-  g_strfreev(type_parts);
-  if (g_str_has_prefix(type, "Identity"))
-    card->type = (card_is_runner(card) ? RUNNER_ID : CORP_ID);
-  else if (g_str_has_prefix(type, "Event"))
-    card->type = RUNNER_EVENT;
-  else if (g_str_has_prefix(type, "Hardware"))
-    card->type = RUNNER_HARDWARE;
-  else if (g_str_has_prefix(type, "Program: Icebreaker"))
-    card->type = RUNNER_PROGRAM;
-  else if (g_str_has_prefix(type, "Program"))
-    card->type = RUNNER_ICEBREAKER;
-  else if (g_str_has_prefix(type, "Resource"))
-    card->type = RUNNER_RESOURCE;
-  else if (g_str_has_prefix(type, "Agenda"))
-    card->type = CORP_AGENDA;
-  else if (g_str_has_prefix(type, "Asset"))
-    card->type = CORP_ASSET;
-  else if (g_str_has_prefix(type, "Upgrade"))
-    card->type = CORP_UPGRADE;
-  else if (g_str_has_prefix(type, "Operation"))
-    card->type = CORP_OPERATION;
-  else if (g_str_has_prefix(type, "ICE"))
-    card->type = CORP_ICE;
-  else
-    g_error("Unknown card type.");
+  gboolean ok = hash_card_type(type, faction, &card->type);
+  /* TODO: Something better than g_assert(). */
+  g_assert(ok);
 
   card->type_str = g_strdup(type);
   card->set = set;

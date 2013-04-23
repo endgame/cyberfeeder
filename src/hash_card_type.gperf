@@ -1,0 +1,75 @@
+/* -*- C -*- */
+
+/* cyberfeeder - An Android: Netrunner deckbuilder
+ * Copyright (C) 2013  Jack Kelly <jack@jackkelly.name>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+%{
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#include "card.h"
+
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
+%}
+%struct-type
+%ignore-case
+%includes
+%define hash-function-name hash_card_type_hash
+%define lookup-function-name hash_card_type_lookup
+struct entry { const char* name; enum card_type value; };
+%%
+Identity, CORP_ID
+Event, RUNNER_EVENT
+Hardware, RUNNER_HARDWARE
+Program, RUNNER_PROGRAM
+Resource, RUNNER_RESOURCE
+Agenda, CORP_AGENDA
+Assert, CORP_ASSET
+Upgrade, CORP_UPGRADE
+Operation, CORP_OPERATION
+ICE, CORP_ICE
+%%
+gboolean hash_card_type(const char *name,
+                        enum faction faction,
+                        enum card_type *result) {
+  gchar** type_parts = g_strsplit(name, ": ", 2);
+  struct entry *type = hash_card_type_lookup(type_parts[0],
+                                             strlen(type_parts[0]));
+  if (type == NULL) {
+    g_strfreev(type_parts);
+    return FALSE;
+  }
+
+  *result = type->value;
+
+  /* Fix-ups */
+  if (*result == CORP_ID && (faction == RUNNER_ANARCH
+                             || faction == RUNNER_CRIMINAL
+                             || faction == RUNNER_SHAPER
+                             || faction == RUNNER_NEUTRAL)) *result = RUNNER_ID;
+  if (*result == RUNNER_PROGRAM
+      && type_parts[1] != NULL
+      && g_str_has_prefix(type_parts[1], "Icebreaker")) {
+    *result = RUNNER_ICEBREAKER;
+  }
+
+  g_strfreev(type_parts);
+  return TRUE;
+}

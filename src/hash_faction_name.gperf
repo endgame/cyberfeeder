@@ -1,3 +1,5 @@
+/* -*- C -*- */
+
 /* cyberfeeder - An Android: Netrunner deckbuilder
  * Copyright (C) 2013  Jack Kelly <jack@jackkelly.name>
  *
@@ -29,8 +31,8 @@
 %struct-type
 %ignore-case
 %includes
-%define hash-function-name faction_lookup_hash
-%define lookup-function-name faction_lookup_in_word_set
+%define hash-function-name hash_faction_name_hash
+%define lookup-function-name hash_faction_name_lookup
 struct entry { const char* name; enum faction value; };
 %%
 anarch,          RUNNER_ANARCH
@@ -43,8 +45,8 @@ nbn,             CORP_NBN
 weyland,         CORP_WEYLAND
 corp_neutral,    CORP_NEUTRAL
 %%
-gboolean faction_lookup(const char *name, enum faction *result) {
-  struct entry *faction = faction_lookup_in_word_set(name, strlen(name));
+gboolean hash_faction_name(const char *name, enum faction *result) {
+  struct entry *faction = hash_faction_name_lookup(name, strlen(name));
   if (faction == NULL) return FALSE;
   *result = faction->value;
   return TRUE;

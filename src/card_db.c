@@ -24,7 +24,7 @@
 #include <jansson.h>
 
 #include "card.h"
-#include "faction_lookup.h"
+#include "hash.h"
 
 struct card_db* card_db_new(void) {
   struct card_db *db = g_new(struct card_db, 1);
@@ -106,7 +106,7 @@ static struct card* load_card(json_t *j_card, const char *set_name) {
   g_assert(json_is_string(j_faction));
   const char *str_faction = json_string_value(j_faction);
   enum faction faction;
-  gboolean ok = faction_lookup(str_faction, &faction);
+  gboolean ok = hash_faction_name(str_faction, &faction);
   g_assert(ok);
 
   json_t *j_type = json_object_get(j_card, "type");

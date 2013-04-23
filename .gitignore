@@ -15,5 +15,6 @@ config.status
 configure
 cyberfeeder
 m4/*.m4
-src/faction_lookup.c
+src/hash_card_type.c
+src/hash_faction_name.c
 stamp-h1
