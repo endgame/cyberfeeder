@@ -143,7 +143,11 @@ static struct card* load_card(json_t *j_card, const char *set_name) {
   }
 
   json_t *j_illustrator = json_object_get(j_card, "illustrator");
-  g_assert(json_is_string(j_illustrator));
+  const char* illustrator = NULL;
+  if (j_illustrator != NULL) {
+    g_assert(json_is_string(j_illustrator));
+    illustrator = json_string_value(j_illustrator);
+  }
 
   struct card *card = card_new(faction,
                                json_string_value(j_type),
@@ -154,7 +158,7 @@ static struct card* load_card(json_t *j_card, const char *set_name) {
                                json_string_value(j_name),
                                json_string_value(j_text),
                                flavor,
-                               json_string_value(j_illustrator));
+                               illustrator);
 
   return fill_card(card, j_card);
 }

@@ -61,7 +61,7 @@ struct card {
   gchar *name;
   gchar *text;
   gchar *flavor; /* May be NULL */
-  gchar *illustrator;
+  gchar *illustrator; /* May be NULL (Corp IDs) */
 
   gint8 cost; /* Rez cost for assets/upgrades/ice; advance cost for agendas */
   gint8 agenda_points; /* Agendas only */

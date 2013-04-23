@@ -38,7 +38,6 @@ struct card* card_new(enum faction faction,
   g_assert(quantity > 0);
   g_assert(name != NULL);
   g_assert(text != NULL);
-  g_assert(illustrator != NULL);
 
   struct card *card = g_new(struct card, 1);
   card->faction = faction;
