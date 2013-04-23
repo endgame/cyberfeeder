@@ -162,7 +162,10 @@ static struct card* load_card(json_t *j_card, const char *set_name) {
 void card_db_load_file(struct card_db *db, const gchar *path) {
   json_error_t err;
   json_t *j_set = json_load_file(path, 0, &err);
-  if(!json_is_object(j_set)) puts(err.text);
+  // TODO: Log properly.
+  if(!json_is_object(j_set)) {
+    printf("%s:%d:%d: %s\n", err.source, err.line, err.column, err.text);
+  }
   // TODO: something better than g_assert().
   g_assert(json_is_object(j_set));
 
