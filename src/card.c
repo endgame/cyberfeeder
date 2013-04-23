@@ -19,6 +19,8 @@
 #include <config.h>
 #endif
 
+#include <string.h>
+
 #include "card.h"
 #include "hash.h"
 
@@ -56,7 +58,7 @@ struct card* card_new(enum faction faction,
   card->flavor = g_strdup(flavor);
   card->illustrator = g_strdup(illustrator);
 
-  card->cost = -1;
+  card->cost = NULL;
   card->agenda_points = -1;
   card->influence_cost = -1;
   card->trash_cost = -1;
@@ -93,8 +95,17 @@ struct card* card_fill_runner_id(struct card *card,
   return card_fill_id(card, min_decksize, max_influence);
 }
 
+/* Either "X" or totally composed of digits. */
+static gboolean is_valid_cost(const gchar *cost) {
+  if (strcmp(cost, "X") == 0) return TRUE;
+  for (int i = 0; cost[i] != '\0'; i++) {
+    if (!g_ascii_isdigit(cost[i])) return FALSE;
+  }
+  return TRUE;
+}
+
 struct card* card_fill_costed(struct card *card,
-                              gint8 cost,
+                              const gchar *cost,
                               gint8 influence_cost) {
   g_assert((card_is_runner(card) && (card->type == RUNNER_EVENT
                                      || card->type == RUNNER_HARDWARE
@@ -105,20 +116,21 @@ struct card* card_fill_costed(struct card *card,
                                       || card->type == CORP_UPGRADE
                                       || card->type == CORP_OPERATION
                                       || card->type == CORP_ICE)));
-  g_assert(cost >= 0);
+  g_assert(cost != NULL && is_valid_cost(cost));
   if (card_is_neutral(card)) {
     g_assert(influence_cost == 0);
   } else {
     g_assert(influence_cost > 0);
   }
 
-  card->cost = cost;
-  card->influence_cost = cost;
+  if (card->cost != NULL) g_free(card->cost);
+  card->cost = g_strdup(cost);
+  card->influence_cost = influence_cost;
   return card;
 }
 
 struct card* card_fill_program(struct card *card,
-                               gint8 cost,
+                               const gchar *cost,
                                gint8 influence_cost,
                                gint8 memory_cost) {
   g_assert(card_is_runner(card));
@@ -131,7 +143,7 @@ struct card* card_fill_program(struct card *card,
 }
 
 struct card* card_fill_icebreaker(struct card *card,
-                                  gint8 cost,
+                                  const gchar *cost,
                                   gint8 influence_cost,
                                   gint8 memory_cost,
                                   gint8 strength) {
@@ -152,20 +164,22 @@ struct card* card_fill_corp_id(struct card *card,
 }
 
 struct card* card_fill_agenda(struct card *card,
-                              gint8 cost,
+                              const gchar *cost,
                               gint8 agenda_points) {
   g_assert(card_is_corp(card));
   g_assert(card->type == CORP_AGENDA);
+  // XXX: This is wrong! Convert to int and check.
   g_assert(cost > 0);
   g_assert(agenda_points > 0);
 
-  card->cost = cost;
+  if (card->cost != NULL) g_free(card->cost);
+  card->cost = g_strdup(cost);
   card->agenda_points = agenda_points;
   return card;
 }
 
 struct card* card_fill_asset_upgrade(struct card *card,
-                                     gint8 cost,
+                                     const gchar *cost,
                                      gint8 influence_cost,
                                      gint8 trash_cost) {
   g_assert(card_is_corp(card));
@@ -177,7 +191,7 @@ struct card* card_fill_asset_upgrade(struct card *card,
 }
 
 struct card* card_fill_ice(struct card *card,
-                           gint8 cost,
+                           const gchar *cost,
                            gint8 influence_cost,
                            gint8 strength) {
   g_assert(card_is_corp(card));
@@ -194,6 +208,7 @@ void card_free(struct card *card) {
   g_free(card->text);
   g_free(card->flavor);
   g_free(card->illustrator);
+  g_free(card->cost);
   g_free(card);
 }
 

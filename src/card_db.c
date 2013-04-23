@@ -21,6 +21,7 @@
 
 #include "card_db.h"
 
+#include <glib/gprintf.h>
 #include <jansson.h>
 
 #include "card.h"
@@ -40,7 +41,7 @@ void card_db_free(struct card_db *db) {
 }
 
 static struct card* fill_card(struct card *card, json_t *j_card) {
-  gint8 agenda_points, base_link, cost, influence_cost, max_influence,
+  gint8 agenda_points, base_link, influence_cost, max_influence,
     memory_cost, min_decksize, strength, trash_cost;
   const struct {
     const char *field;
@@ -49,7 +50,6 @@ static struct card* fill_card(struct card *card, json_t *j_card) {
   } *p, field_table[] = {
     { "agenda_points" , &agenda_points , card_has_agenda_points  },
     { "base_link"     , &base_link     , card_has_base_link      },
-    { "cost"          , &cost          , card_has_cost           },
     { "influence_cost", &influence_cost, card_has_influence_cost },
     { "max_influence" , &max_influence , card_has_max_influence  },
     { "memory_cost"   , &memory_cost   , card_has_memory_cost    },
@@ -65,6 +65,27 @@ static struct card* fill_card(struct card *card, json_t *j_card) {
     json_t *json_obj = json_object_get(j_card, p->field);
     g_assert(json_is_integer(json_obj));
     *p->p_int = json_integer_value(json_obj);
+  }
+
+  /* Handle cost separately; "X" is a valid cost (Psychographics). */
+  const char *cost = NULL;
+  char cost_buf[3]; /* Like they'll ever print a card with triple-digit cost. */
+  if (card_has_cost(card)) {
+    json_t *j_cost = json_object_get(j_card, "cost");
+    if (json_is_integer(j_cost)) {
+      guint count = g_snprintf(cost_buf,
+                               sizeof(cost_buf),
+                               "%" JSON_INTEGER_FORMAT,
+                               json_integer_value(j_cost));
+      // TODO: Something better than g_assert().
+      g_assert(count < sizeof(cost_buf));
+      cost = cost_buf;
+    } else if (json_is_string(j_cost)) {
+      cost = json_string_value(j_cost);
+    } else {
+      // TODO: Something better than g_assert().
+      g_assert_not_reached();
+    }
   }
 
   switch (card->type) {
