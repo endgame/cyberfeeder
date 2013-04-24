@@ -8,7 +8,7 @@
       "base_link": 0,
       "min_decksize": 45,
       "max_influence": 15,
-      "text": "Whenever you install a <b>virus</b> program, the Corp trashes the top card of R&D.",
+      "text": "Whenever you install a <b>virus</b> program, the Corp trashes the top card of R&amp;D.",
       "flavor": "<i>\"Watch this. It'll be funny.\"</i>",
       "illustrator": "Ralph Beisner"},
 
@@ -30,7 +30,7 @@
       "type": "Event: Run - Sabotage",
       "cost": 2,
       "influence_cost": 2,
-      "text": "Make a run on HQ or R&D. You may trash, at no cost, any cards you access (even if the cards cannot normally be trashed).",
+      "text": "Make a run on HQ or R&amp;D. You may trash, at no cost, any cards you access (even if the cards cannot normally be trashed).",
       "flavor": "<i>You ever set something on fire just to watch it burn?</i>",
       "illustrator": "Anna Ignatieva"},
 
@@ -110,7 +110,7 @@
       "cost": 3,
       "memory_cost": 1,
       "influence_cost": 3,
-      "text": "Whenever you make a successful run on R&D, place 1 virus counter on Medium.\nEach virus counter after the first on Medium allows you to access 1 additional card from R&D when you access cards from R&D.",
+      "text": "Whenever you make a successful run on R&amp;D, place 1 virus counter on Medium.\nEach virus counter after the first on Medium allows you to access 1 additional card from R&amp;D when you access cards from R&amp;D.",
       "flavor": "<i>It looked like random packet loss. It wasn't.</i>",
       "illustrator": "Adam S. Doyle"},
 
@@ -409,7 +409,7 @@
       "type": "Event: Run",
       "cost": 2,
       "influence_cost": 2,
-      "text": "Make a run on R&D. If successful, access 2 additional cards from R&D.",
+      "text": "Make a run on R&amp;D. If successful, access 2 additional cards from R&amp;D.",
       "flavor": "<i>\"Some of the professionals have good instincts, but they can't see beyond the data. They can't see beyond the matrix.\" -Ele \"Smoke\" Scovak</i>",
       "illustrator": "Yue Wang"},
 
@@ -625,7 +625,7 @@
       "type": "Agenda: Research",
       "cost": 3,
       "agenda_points": 2,
-      "text": "When you score Accelerated Beta Test, you may look at the top 3 cards of R&D. If any of those cards are ice, you may install and rez them, ignoring all costs. Trash the rest of the cards you looked at.",
+      "text": "When you score Accelerated Beta Test, you may look at the top 3 cards of R&amp;D. If any of those cards are ice, you may install and rez them, ignoring all costs. Trash the rest of the cards you looked at.",
       "illustrator": "Rachel Borovic"},
 
      {"name": "Adonis Campaign",
@@ -703,7 +703,7 @@
       "cost": 5,
       "influence_cost": 2,
       "strength": 4,
-      "text": "The Runner can spend [Click] to break any subroutine on Ichi 1.0.\n[Subroutine] Trash 1 program.\n[Subroutine] Trash 1 program.\n[Subroutine] <b>Trace^1</b>- If successful, give the Runner 1 tag and do 1 brain damage.",
+      "text": "The Runner can spend [Click] to break any subroutine on Ichi 1.0.\n[Subroutine] Trash 1 program.\n[Subroutine] Trash 1 program.\n[Subroutine] <b>Trace<sup>1</sup></b>- If successful, give the Runner 1 tag and do 1 brain damage.",
       "flavor": "<i>My reputation would precede me, if any could speak of it.</i>",
       "illustrator": "Gong Studios"},
 
@@ -794,7 +794,7 @@
       "cost": 0,
       "trash_cost": 0,
       "influence_cost": 2,
-      "text": "If Snare! is accessed from R&D, the Runner must reveal it.\nIf you pay 4[Credits] when the Runner accesses Snare!, do 3 net damage and give the Runner 1 tag. Ignore this effect if the Runner accesses Snare! from Archives.",
+      "text": "If Snare! is accessed from R&amp;D, the Runner must reveal it.\nIf you pay 4[Credits] when the Runner accesses Snare!, do 3 net damage and give the Runner 1 tag. Ignore this effect if the Runner accesses Snare! from Archives.",
       "illustrator": "Alice Duke"},
 
      {"name": "Zaibatsu Loyalty",
@@ -826,7 +826,7 @@
       "type": "Operation",
       "cost": 0,
       "influence_cost": 3,
-      "text": "Look at the top 5 cards of R&D and arrange them in any order.",
+      "text": "Look at the top 5 cards of R&amp;D and arrange them in any order.",
       "flavor": "<i>There was a new texture in her phantom cortex. It had always been there, she realized. It was everything, and nothing.</i>",
       "illustrator": "Alexandra Douglass"},
 
@@ -972,7 +972,7 @@
       "type": "Operation",
       "cost": 2,
       "influence_cost": 2,
-      "text": "Play only if the Runner made a successful run during his or her last turn.\n<b>Trace^3</b>- If successful, give the Runner 1 tag.",
+      "text": "Play only if the Runner made a successful run during his or her last turn.\n<b>Trace<sup>3</sup></b>- If successful, give the Runner 1 tag.",
       "flavor": "<i>\"The SEA tipped us off to some suspicious data spikes up by the Castle.\" -Jerome Lock, on-duty tech</i>",
       "illustrator": "Mauricio Herrera"},
 
@@ -995,7 +995,7 @@
       "cost": 4,
       "influence_cost": 2,
       "strength": 4,
-      "text": "When the Runner encounters Data Raven, he or she must either take 1 tag or end the run.\n<b>Hosted Power Counter:</b> Give the Runner 1 tag.\n[Subroutine] <b>Trace^3</b>- If successful, place 1 power counter on Data Raven.",
+      "text": "When the Runner encounters Data Raven, he or she must either take 1 tag or end the run.\n<b>Hosted Power Counter:</b> Give the Runner 1 tag.\n[Subroutine] <b>Trace<sup>3</sup></b>- If successful, place 1 power counter on Data Raven.",
       "illustrator": "Gong Studios"},
 
      {"name": "Matrix Analyzer",
@@ -1006,7 +1006,7 @@
       "cost": 1,
       "influence_cost": 2,
       "strength": 3,
-      "text": "When the Runner encounters Matrix Analyzer, you may pay 1[Credit] to place 1 advancement token on a card that can be advanced.\n[Subroutine] <b>Trace^2</b>- If successful, give the Runner 1 tag.",
+      "text": "When the Runner encounters Matrix Analyzer, you may pay 1[Credit] to place 1 advancement token on a card that can be advanced.\n[Subroutine] <b>Trace<sup>2</sup></b>- If successful, give the Runner 1 tag.",
       "flavor": "Analyzing was great. Delegating commands turned out to be even better.",
       "illustrator": "Isuardi Therianto"},
 
@@ -1096,7 +1096,7 @@
       "type": "Operation",
       "cost": 1,
       "influence_cost": 1,
-      "text": "Play only if you scored an agenda this turn.\nSearch R&D for 1 card and add it to HQ. Shuffle R&D.",
+      "text": "Play only if you scored an agenda this turn.\nSearch R&amp;D for 1 card and add it to HQ. Shuffle R&amp;D.",
       "flavor": "<i>\"I believe you'll find the terms quite favorable.\"</i>",
       "illustrator": "Kate Niemczyk"},
 
@@ -1166,7 +1166,7 @@
       "influence_cost": 1,
       "strength": 1,
       "text": "Ice Wall can be advanced and has +1 strength for each advancement token on it.\n[Subroutine] End the run.",
-      "flavor": "<i>\"I asked for ice as impenetrable as a wall. I can't decide if someone down in R&D has a warped sense of humor or just a very literal mind.\" -Liz Campbell, VP Project Security</i>",
+      "flavor": "<i>\"I asked for ice as impenetrable as a wall. I can't decide if someone down in R&amp;D has a warped sense of humor or just a very literal mind.\" -Liz Campbell, VP Project Security</i>",
       "illustrator": "Matthew Zeilinger"},
 
      {"name": "Shadow",
@@ -1177,7 +1177,7 @@
       "cost": 3,
       "influence_cost": 1,
       "strength": 1,
-      "text": "Shadow can be advanced and has +1 strength for each advancement token on it.\n[Subroutine] The Corp gains 2[Credits].\n[Subroutine] <b>Trace^3</b>- If successful, give the Runner 1 tag.",
+      "text": "Shadow can be advanced and has +1 strength for each advancement token on it.\n[Subroutine] The Corp gains 2[Credits].\n[Subroutine] <b>Trace<sup>3</sup></b>- If successful, give the Runner 1 tag.",
       "flavor": "<i>Who knows what evil lurks in the memory diamonds of men? Weyland knows.\n-unsigned cyber-graffiti</i>",
       "illustrator": "Adam S. Doyle"},
 
@@ -1270,8 +1270,8 @@
       "cost": 1,
       "influence_cost": 0,
       "strength": 4,
-      "text": "[Subroutine] <b>Trace^3</b>- If successful, give the Runner 1 tag.",
-      "flavor": "<i>.//run/hunter-tr/return=true\nclient/sec256IPv7->confirm? /y\n3926:0HB7:1001:2NB1:1601:7784:ERRROR</i>",
+      "text": "[Subroutine] <b>Trace<sup>3</sup></b>- If successful, give the Runner 1 tag.",
+      "flavor": "<i>.//run/hunter-tr/return=true\nclient/sec256IPv7->confirm? /y\n3926:0HB7:1001:2NB1:1601:7784:ERROR</i>",
       "illustrator": "Christina Davis"},
 
      {"name": "Wall of Static",
