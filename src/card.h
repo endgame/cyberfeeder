@@ -53,13 +53,14 @@ enum card_type {
 
 struct card {
   gchar *name;
+  const gchar *set; /* Not owned. Held by struct card_db */
+  gint8 number; /* Noise = 1, Deja Vu = 2, ... */
+  gint8 quantity; /* == 3, except for certain Core cards */
+
   enum faction faction;
   enum card_type type;
   gchar *type_str;
 
-  const gchar *set; /* Not owned. Held by struct card_db */
-  gint8 number; /* Noise = 1, Deja Vu = 2, ... */
-  gint8 quantity; /* == 3, except for certain Core cards */
   gboolean unique; /* e.g., Ice Carver */
   gchar *text;
   gchar *flavor; /* May be NULL */

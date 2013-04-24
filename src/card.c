@@ -50,12 +50,12 @@ struct card* card_new(enum faction faction,
   /* TODO: Something better than g_assert(). */
   g_assert(ok);
 
+  card->name = g_strdup(name);
   card->type_str = g_strdup(type);
   card->set = set;
   card->number = number;
   card->quantity = quantity;
   card->unique = unique;
-  card->name = g_strdup(name);
   card->text = g_strdup(text);
   card->flavor = g_strdup(flavor);
   card->illustrator = g_strdup(illustrator);
