@@ -15,19 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CARD_DB_H
-#define CARD_DB_H
+/* A single set of cards - the core set, or a single data pack. */
+
+#ifndef CARD_SET_H
+#define CARD_SET_H
 
 #include <glib.h>
 #include <string.h>
 
-struct card_db {
+struct card_set {
+  gchar* name;
   GList* /* of struct card*, owned */ cards;
 };
 
-struct card_db* card_db_new(void);
-void card_db_free(struct card_db *db);
+struct card_set* card_set_new(const gchar* name);
+void card_set_free(struct card_set *set);
 
-void card_db_load_file(struct card_db *db, const gchar *path);
+struct card_set* card_set_load_file(const gchar *path);
 
 #endif

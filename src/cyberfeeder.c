@@ -21,14 +21,13 @@
 
 #include <gtk/gtk.h>
 
-#include "card_db.h"
+#include "card_set.h"
 
 int main(int argc, char *argv[]) {
   gtk_init(&argc, &argv);
 
-  struct card_db* db = card_db_new();
-  card_db_load_file(db, "data/00_Core.json");
-  card_db_free(db);
+  struct card_set* set = card_set_load_file("data/00_Core.json");
+  card_set_free(set);
 
   GtkWidget* window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title(GTK_WINDOW(window), "Cyberfeeder");

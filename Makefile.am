@@ -11,8 +11,8 @@ EXTRA_DIST = data/00_Core.json
 cyberfeeder_SOURCES = \
 	src/card.c \
 	src/card.h \
-	src/card_db.c \
-	src/card_db.h \
+	src/card_set.c \
+	src/card_set.h \
 	src/cyberfeeder.c \
 	src/hash.h \
 	src/hash_card_type.gperf \

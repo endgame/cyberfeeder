@@ -19,7 +19,7 @@
 #include <config.h>
 #endif
 
-#include "card_db.h"
+#include "card_set.h"
 
 #include <glib/gprintf.h>
 #include <jansson.h>
@@ -27,17 +27,20 @@
 #include "card.h"
 #include "hash.h"
 
-struct card_db* card_db_new(void) {
-  struct card_db *db = g_new(struct card_db, 1);
-  db->cards = NULL;
-  return db;
+struct card_set* card_set_new(const gchar* name) {
+  g_assert(name != NULL);
+  struct card_set *set = g_new(struct card_set, 1);
+  set->name = g_strdup(name);
+  set->cards = NULL;
+  return set;
 }
 
-void card_db_free(struct card_db *db) {
-  if (db == NULL) return;
+void card_set_free(struct card_set *set) {
+  if (set == NULL) return;
+  g_free(set->name);
   void free_card(gpointer p) { card_free(p); }
-  g_list_free_full(db->cards, free_card);
-  g_free(db);
+  g_list_free_full(set->cards, free_card);
+  g_free(set);
 }
 
 static struct card* fill_card(struct card *card, json_t *j_card) {
@@ -184,7 +187,7 @@ static struct card* load_card(json_t *j_card, const char *set_name) {
   return fill_card(card, j_card);
 }
 
-void card_db_load_file(struct card_db *db, const gchar *path) {
+struct card_set* card_set_load_file(const gchar *path) {
   json_error_t err;
   json_t *j_set = json_load_file(path, 0, &err);
   // TODO: Log properly.
@@ -197,25 +200,25 @@ void card_db_load_file(struct card_db *db, const gchar *path) {
   json_t *j_set_name = json_object_get(j_set, "name");
   g_assert(json_is_string(j_set_name));
   const char *set_name = json_string_value(j_set_name);
+  struct card_set* set = card_set_new(set_name);
   g_message("Loading set: %s", set_name);
 
   json_t *j_cards = json_object_get(j_set, "cards");
   g_assert(json_is_array(j_cards));
   gsize n = json_array_size(j_cards);
 
-  GList *cards = NULL;
   for (uint i = 0; i < n; i++) {
     json_t *j_card = json_array_get(j_cards, i);
     g_assert(json_is_object(j_card));
     // TODO, XXX: this will leave card pointing to unitialised memory!
-    // TODO, XXX: Fix it ASAP by adding card sets to card_db!
+    // TODO, XXX: Fix it ASAP by adding card sets to card_set!
     struct card *card = load_card(j_card, set_name);
     g_debug("Loaded card: %s", card->name);
-    cards = g_list_prepend(cards, card);
+    set->cards = g_list_prepend(set->cards, card);
   }
 
   json_decref(j_set);
 
-  cards = g_list_reverse(cards);
-  db->cards = g_list_concat(db->cards, cards);
+  set->cards = g_list_reverse(set->cards);
+  return set;
 }
