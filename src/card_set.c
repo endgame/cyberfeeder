@@ -210,9 +210,7 @@ struct card_set* card_set_load_file(const gchar *path) {
   for (uint i = 0; i < n; i++) {
     json_t *j_card = json_array_get(j_cards, i);
     g_assert(json_is_object(j_card));
-    // TODO, XXX: this will leave card pointing to unitialised memory!
-    // TODO, XXX: Fix it ASAP by adding card sets to card_set!
-    struct card *card = load_card(j_card, set_name);
+    struct card *card = load_card(j_card, set->name);
     g_debug("Loaded card: %s", card->name);
     g_ptr_array_add(set->cards, card);
   }
