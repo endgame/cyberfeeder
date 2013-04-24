@@ -27,19 +27,20 @@
 #include "card.h"
 #include "hash.h"
 
+static void free_card(gpointer p) { card_free(p); }
+
 struct card_set* card_set_new(const gchar* name) {
   g_assert(name != NULL);
   struct card_set *set = g_new(struct card_set, 1);
   set->name = g_strdup(name);
-  set->cards = NULL;
+  set->cards = g_ptr_array_new_with_free_func(free_card);
   return set;
 }
 
 void card_set_free(struct card_set *set) {
   if (set == NULL) return;
   g_free(set->name);
-  void free_card(gpointer p) { card_free(p); }
-  g_list_free_full(set->cards, free_card);
+  g_ptr_array_free(set->cards, TRUE);
   g_free(set);
 }
 
@@ -214,11 +215,9 @@ struct card_set* card_set_load_file(const gchar *path) {
     // TODO, XXX: Fix it ASAP by adding card sets to card_set!
     struct card *card = load_card(j_card, set_name);
     g_debug("Loaded card: %s", card->name);
-    set->cards = g_list_prepend(set->cards, card);
+    g_ptr_array_add(set->cards, card);
   }
 
   json_decref(j_set);
-
-  set->cards = g_list_reverse(set->cards);
   return set;
 }

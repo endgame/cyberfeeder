@@ -25,7 +25,7 @@
 
 struct card_set {
   gchar* name;
-  GList* /* of struct card*, owned */ cards;
+  GPtrArray* /* of struct card*, owned */ cards;
 };
 
 struct card_set* card_set_new(const gchar* name);
