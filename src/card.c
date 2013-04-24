@@ -19,11 +19,13 @@
 #include <config.h>
 #endif
 
+#include <errno.h>
 #include <string.h>
 
 #include "card.h"
 #include "hash.h"
 
+// TODO: Turn g_assert() into logic checks and log errors.
 struct card* card_new(enum faction faction,
                       const gchar *type,
                       const gchar *set,
@@ -168,8 +170,10 @@ struct card* card_fill_agenda(struct card *card,
                               gint8 agenda_points) {
   g_assert(card_is_corp(card));
   g_assert(card->type == CORP_AGENDA);
-  // XXX: This is wrong! Convert to int and check.
-  g_assert(cost > 0);
+  errno = 0;
+  char* end;
+  gint64 i_cost = g_ascii_strtoll(cost, &end, 10);
+  g_assert(errno == 0 && i_cost > 0 && *end == '\0');
   g_assert(agenda_points > 0);
 
   if (card->cost != NULL) g_free(card->cost);
