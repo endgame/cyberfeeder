@@ -616,7 +616,7 @@
       "min_decksize": 45,
       "max_influence": 15,
       "text": "The first time you install a card each turn, gain 1[Credit].",
-      "flavor": "Effective. Reliable. Humane."},
+      "flavor": "<i>Effective. Reliable. Humane.</i>"},
 
      {"name": "Accelerated Beta Test",
       "number": 55,
