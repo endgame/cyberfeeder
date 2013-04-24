@@ -18,11 +18,11 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
+#include "card.h"
 
 #include <errno.h>
 #include <string.h>
 
-#include "card.h"
 #include "hash.h"
 
 // TODO: Turn g_assert() into logic checks and log errors.

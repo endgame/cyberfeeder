@@ -18,7 +18,6 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-
 #include "card_set.h"
 
 #include <glib/gprintf.h>

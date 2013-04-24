@@ -21,18 +21,43 @@
 
 #include <gtk/gtk.h>
 
+#include "card.h"
 #include "card_set.h"
+
+enum columns {
+  NAME,
+  N_COLUMNS
+};
 
 int main(int argc, char *argv[]) {
   gtk_init(&argc, &argv);
 
-  struct card_set* set = card_set_load_file("data/00_Core.json");
-  card_set_free(set);
-
+  struct card_set *set = card_set_load_file("data/00_Core.json");
   GtkWidget* window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title(GTK_WINDOW(window), "Cyberfeeder");
   g_signal_connect (window, "destroy", G_CALLBACK (gtk_main_quit), NULL);
+
+  GtkListStore *store = gtk_list_store_new(N_COLUMNS, G_TYPE_STRING);
+  for (guint i = 0; i < set->cards->len; i++) {
+    struct card *card = g_ptr_array_index(set->cards, i);
+    GtkTreeIter iter;
+    gtk_list_store_append(store, &iter);
+    gtk_list_store_set(store, &iter, NAME, card->name, -1);
+  }
+  GtkWidget *card_list = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+  GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn *column =
+    gtk_tree_view_column_new_with_attributes ("Name", renderer, "markup",
+                                              NAME, NULL);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(card_list), column);
+
+  GtkWidget *scroller = gtk_scrolled_window_new(NULL, NULL);
+  gtk_container_add(GTK_CONTAINER(scroller), card_list);
+  gtk_widget_show(card_list);
+  gtk_container_add(GTK_CONTAINER(window), scroller);
+  gtk_widget_show(scroller);
   gtk_widget_show(window);
   gtk_main();
+  card_set_free(set);
   return 0;
 }

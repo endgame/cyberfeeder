@@ -33,6 +33,8 @@ enum faction {
   CORP_NEUTRAL,
 };
 
+const gchar* faction_to_string(enum faction faction);
+
 enum card_type {
   RUNNER_ID,
   RUNNER_EVENT,
@@ -50,6 +52,7 @@ enum card_type {
 };
 
 struct card {
+  gchar *name;
   enum faction faction;
   enum card_type type;
   gchar *type_str;
@@ -58,7 +61,6 @@ struct card {
   gint8 number; /* Noise = 1, Deja Vu = 2, ... */
   gint8 quantity; /* == 3, except for certain Core cards */
   gboolean unique; /* e.g., Ice Carver */
-  gchar *name;
   gchar *text;
   gchar *flavor; /* May be NULL */
   gchar *illustrator; /* May be NULL (Corp IDs) */
