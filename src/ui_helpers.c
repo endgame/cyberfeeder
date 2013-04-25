@@ -24,6 +24,101 @@
 
 #include "card.h"
 
+/* Call pango to parse its markup and insert it into a GtkTextBuffer. It
+   is SHAMEFUL that GTK bug 59390 hasn't been fixed[1]. When it has,
+   this can go away.
+
+   Inspired by the neglected patch attached to said bug.
+
+   [1]: https://bugzilla.gnome.org/show_bug.cgi?id=59390 */
+
+void insert_markup_text(GtkTextBuffer *buffer,
+                        GtkTextIter *iter,
+                        const gchar *markup) {
+  PangoAttrList *attr_list;
+  gchar *text;
+  // TODO: error detection and logging.
+  gboolean ok =
+    pango_parse_markup(markup, -1, 0, &attr_list, &text, NULL, NULL);
+  g_assert(ok);
+
+  if (attr_list == NULL) {
+    gtk_text_buffer_insert(buffer, iter, markup, -1);
+    g_free(text);
+    return;
+  }
+
+  PangoAttrIterator *pa_iter = pango_attr_list_get_iterator(attr_list);
+  do {
+    PangoAttribute *attr;
+    gint start, end;
+    pango_attr_iterator_range(pa_iter, &start, &end);
+
+    if (end == G_MAXINT) end = start - 1;
+
+    GtkTextTag *tag = gtk_text_buffer_create_tag(buffer, NULL, NULL);
+    if ((attr = pango_attr_iterator_get(pa_iter, PANGO_ATTR_LANGUAGE))) {
+      g_object_set(tag, "language",
+                   pango_language_to_string(((PangoAttrLanguage*)attr)->value),
+                   NULL);
+    }
+
+    if ((attr = pango_attr_iterator_get(pa_iter, PANGO_ATTR_FAMILY))) {
+      g_object_set(tag, "family", ((PangoAttrString*)attr)->value, NULL);
+    }
+
+    static const struct {
+      const gchar* name; const PangoAttrType pango_name;
+    } *p, table[] = {
+      { "style"     , PANGO_ATTR_STYLE     },
+      { "weight"    , PANGO_ATTR_WEIGHT    },
+      { "variant"   , PANGO_ATTR_VARIANT   },
+      { "stretch"   , PANGO_ATTR_STRETCH   },
+      { "size"      , PANGO_ATTR_SIZE      },
+      { "underline" , PANGO_ATTR_UNDERLINE },
+      { "rise"      , PANGO_ATTR_RISE      },
+      { NULL        , -1                   }
+    };
+    for (p = table; p->name != NULL; p++) {
+      if ((attr = pango_attr_iterator_get(pa_iter, p->pango_name))) {
+        g_object_set(tag, p->name, ((PangoAttrInt*)attr)->value, NULL);
+      }
+    }
+
+    if ((attr = pango_attr_iterator_get(pa_iter, PANGO_ATTR_FONT_DESC))) {
+      g_object_set(tag, "font-desc", ((PangoAttrFontDesc*)attr)->desc, NULL);
+    }
+
+    if ((attr = pango_attr_iterator_get(pa_iter, PANGO_ATTR_FOREGROUND))) {
+      PangoAttrColor *c = (PangoAttrColor*)attr;
+      GdkColor col = { 0, c->color.red, c->color.green, c->color.blue };
+      g_object_set(tag, "foreground-gdk", &col, NULL);
+    }
+    if ((attr = pango_attr_iterator_get(pa_iter, PANGO_ATTR_BACKGROUND))) {
+      PangoAttrColor *c = (PangoAttrColor*)attr;
+      GdkColor col = { 0, c->color.red, c->color.green, c->color.blue };
+      g_object_set(tag, "background-gdk", &col, NULL);
+    }
+
+    if ((attr = pango_attr_iterator_get(pa_iter, PANGO_ATTR_STRIKETHROUGH))) {
+      g_object_set(tag, "strikethrough",
+                   (gboolean)((PangoAttrInt*)attr)->value, NULL);
+    }
+
+    if ((attr = pango_attr_iterator_get(pa_iter, PANGO_ATTR_SCALE))) {
+      g_object_set(tag, "scale", ((PangoAttrFloat*)attr)->value, NULL);
+    }
+
+    gtk_text_buffer_insert_with_tags(buffer, iter,
+                                     text + start, end - start,
+                                     tag, NULL);
+  } while (pango_attr_iterator_next(pa_iter));
+
+  pango_attr_iterator_destroy(pa_iter);
+  pango_attr_list_unref(attr_list);
+  g_free(text);
+}
+
 void ui_helpers_text_buffer_add_card(GtkTextBuffer *buffer,
                                      GtkTextIter *iter,
                                      const struct card *card) {
@@ -80,11 +175,11 @@ void ui_helpers_text_buffer_add_card(GtkTextBuffer *buffer,
     g_free(line);
   }
 
-  gtk_text_buffer_insert(buffer, iter, card->text, -1);
+  insert_markup_text(buffer, iter, card->text);
   gtk_text_buffer_insert(buffer, iter, "\n", -1);
 
   if (card->flavor != NULL) {
-    gtk_text_buffer_insert(buffer, iter, card->flavor, -1);
+    insert_markup_text(buffer, iter, card->flavor);
     gtk_text_buffer_insert(buffer, iter, "\n", -1);
   }
 

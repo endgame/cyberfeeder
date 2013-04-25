@@ -15,9 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Card info is mainly displayed via a GtkTextView. These functions
-   help with that. */
-
 #ifndef UI_HELPERS_H
 #define UI_HELPERS_H
 
@@ -25,7 +22,7 @@
 
 struct card;
 
-void ui_helpers_text_buffer_add_card(GtkTextBuffer *text,
+void ui_helpers_text_buffer_add_card(GtkTextBuffer *buffer,
                                      GtkTextIter *iter,
                                      const struct card *card);
 
