@@ -15,33 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+/* Each of these constructs one of the pages of the main
+   GtkNotebook. */
+
+#ifndef PAGES_H
+#define PAGES_H
 
 #include <gtk/gtk.h>
 
-#include "card_db.h"
-#include "card_set.h"
-#include "pages.h"
+/* The Toolbox - Card Browser */
+GtkWidget* the_toolbox(void);
 
-struct card_db *DB = NULL;
-
-int main(int argc, char *argv[]) {
-  gtk_init(&argc, &argv);
-
-  DB = card_db_new();
-  struct card_set *set = card_set_load_file("data/00_Core.json");
-  card_db_add_set(DB, set);
-
-  GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title(GTK_WINDOW(window), "Cyberfeeder");
-  gtk_window_set_default_size(GTK_WINDOW(window), 650, 350);
-  g_signal_connect (window, "destroy", G_CALLBACK (gtk_main_quit), NULL);
-
-  gtk_container_add(GTK_CONTAINER(window), the_toolbox());
-  gtk_widget_show_all(window);
-  gtk_main();
-  card_set_free(set);
-  return 0;
-}
+#endif

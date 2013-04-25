@@ -125,14 +125,15 @@ void ui_helpers_text_buffer_add_card(GtkTextBuffer *buffer,
   g_assert(buffer != NULL);
   g_assert(card != NULL);
 
-  gchar *header = g_strdup_printf("%s%s (%s #%d)\n"
+  gchar *name = card_render_name(card);
+  gchar *header = g_strdup_printf("%s (%s #%d)\n"
                                   "%s %s\n",
-                                  card->unique ? "\u25c6" : "",
-                                  card->name,
+                                  name,
                                   card->set,
                                   card->number,
                                   faction_to_string(card->faction),
                                   card->type_str);
+  g_free(name);
   gtk_text_buffer_insert(buffer, iter, header, -1);
   g_free(header);
 

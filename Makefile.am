@@ -19,6 +19,8 @@ cyberfeeder_SOURCES = \
 	src/hash.h \
 	src/hash_card_type.gperf \
 	src/hash_faction_name.gperf \
+	src/pages.h \
+	src/pages/the_toolbox.c \
 	src/ui_helpers.c \
 	src/ui_helpers.h
 

@@ -294,3 +294,7 @@ gboolean card_has_trash_cost(const struct card *card) {
   return (card->type == CORP_ASSET
           || card->type == CORP_UPGRADE);
 }
+
+gchar* card_render_name(const struct card *card) {
+  return g_strdup_printf("%s%s", card->unique ? "\u25c6 " : "", card->name);
+}

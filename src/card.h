@@ -143,4 +143,8 @@ gboolean card_has_min_decksize(const struct card *card);
 gboolean card_has_strength(const struct card *card);
 gboolean card_has_trash_cost(const struct card *card);
 
+/* Return the name of the card, with a diamond in front for
+   uniques. g_free() the result. */
+gchar* card_render_name(const struct card *card);
+
 #endif
