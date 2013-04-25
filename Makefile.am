@@ -18,7 +18,9 @@ cyberfeeder_SOURCES = \
 	src/cyberfeeder.c \
 	src/hash.h \
 	src/hash_card_type.gperf \
-	src/hash_faction_name.gperf
+	src/hash_faction_name.gperf \
+	src/ui_helpers.c \
+	src/ui_helpers.h
 
 .gperf.c:
 	$(AM_V_GEN)$(GPERF) $< > $@

@@ -25,6 +25,21 @@
 
 #include "hash.h"
 
+const gchar* faction_to_string(enum faction faction) {
+  switch (faction) {
+  case RUNNER_ANARCH:     return "Anarch";
+  case RUNNER_CRIMINAL:   return "Criminal";
+  case RUNNER_SHAPER:     return "Shaper";
+  case RUNNER_NEUTRAL:    return "Neutral Runner";
+  case CORP_HAAS_BIOROID: return "Haas-Bioroid";
+  case CORP_JINTEKI:      return "Jinteki";
+  case CORP_NBN:          return "NBN";
+  case CORP_WEYLAND:      return "Weyland";
+  case CORP_NEUTRAL:      return "Neutral Corp";
+  default: g_assert_not_reached();
+  }
+}
+
 // TODO: Turn g_assert() into logic checks and log errors.
 struct card* card_new(enum faction faction,
                       const gchar *type,

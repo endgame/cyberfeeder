@@ -23,6 +23,7 @@
 
 #include "card.h"
 #include "card_set.h"
+#include "ui_helpers.h"
 
 enum columns {
   NAME,
@@ -53,10 +54,16 @@ int main(int argc, char *argv[]) {
 
   GtkWidget *scroller = gtk_scrolled_window_new(NULL, NULL);
   gtk_container_add(GTK_CONTAINER(scroller), card_list);
-  gtk_widget_show(card_list);
-  gtk_container_add(GTK_CONTAINER(window), scroller);
-  gtk_widget_show(scroller);
-  gtk_widget_show(window);
+  // gtk_container_add(GTK_CONTAINER(window), scroller);
+  GtkWidget *textview = gtk_text_view_new();
+  gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(textview), GTK_WRAP_WORD);
+  GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textview));
+  GtkTextIter it;
+  gtk_text_buffer_get_end_iter(buffer, &it);
+  ui_helpers_text_buffer_add_card(buffer, &it,
+                                  g_ptr_array_index(set->cards, 98));
+  gtk_container_add(GTK_CONTAINER(window), textview);
+  gtk_widget_show_all(window);
   gtk_main();
   card_set_free(set);
   return 0;
