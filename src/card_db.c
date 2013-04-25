@@ -26,7 +26,7 @@
 static void free_set(gpointer p) { card_set_free(p); }
 
 struct card_db* card_db_new(void) {
-  struct card_db *db = g_new(struct card_db, 1);
+  struct card_db *db = g_slice_new(struct card_db);
   db->sets = g_ptr_array_new_with_free_func(free_set);
   return db;
 }
@@ -34,7 +34,7 @@ struct card_db* card_db_new(void) {
 void card_db_free(struct card_db *db) {
   if (db == NULL) return;
   g_ptr_array_free(db->sets, TRUE);
-  g_free(db);
+  g_slice_free(struct card_db, db);
 }
 
 void card_db_add_set(struct card_db *db, struct card_set *set) {

@@ -58,7 +58,7 @@ struct card* card_new(enum faction faction,
   g_assert(name != NULL);
   g_assert(text != NULL);
 
-  struct card *card = g_new(struct card, 1);
+  struct card *card = g_slice_new(struct card);
   card->faction = faction;
 
   gboolean ok = hash_card_type(type, faction, &card->type);
@@ -228,7 +228,7 @@ void card_free(struct card *card) {
   g_free(card->flavor);
   g_free(card->illustrator);
   g_free(card->cost);
-  g_free(card);
+  g_slice_free(struct card, card);
 }
 
 gboolean card_is_runner(const struct card *card) {

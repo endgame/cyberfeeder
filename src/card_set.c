@@ -30,7 +30,7 @@ static void free_card(gpointer p) { card_free(p); }
 
 struct card_set* card_set_new(const gchar* name) {
   g_assert(name != NULL);
-  struct card_set *set = g_new(struct card_set, 1);
+  struct card_set *set = g_slice_new(struct card_set);
   set->name = g_strdup(name);
   set->cards = g_ptr_array_new_with_free_func(free_card);
   return set;
@@ -40,7 +40,7 @@ void card_set_free(struct card_set *set) {
   if (set == NULL) return;
   g_free(set->name);
   g_ptr_array_free(set->cards, TRUE);
-  g_free(set);
+  g_slice_free(struct card_set, set);
 }
 
 static struct card* fill_card(struct card *card, json_t *j_card) {
