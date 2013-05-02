@@ -126,15 +126,17 @@ void ui_helpers_text_buffer_add_card(GtkTextBuffer *buffer,
   g_assert(card != NULL);
 
   gchar *name = card_render_name(card);
-  gchar *header = g_strdup_printf("%s (%s #%d)\n"
-                                  "%s %s\n",
+  gchar *header = g_strdup_printf("<big>%s</big>\n"
+                                  "<small>(%s #%d)</small>\n"
+                                  "%s %s\n"
+                                  "\n",
                                   name,
                                   card->set,
                                   card->number,
                                   faction_to_string(card->faction),
                                   card->type_str);
   g_free(name);
-  gtk_text_buffer_insert(buffer, iter, header, -1);
+  insert_markup_text(buffer, iter, header);
   g_free(header);
 
   if (strcmp(card->set, "Core") == 0) {
@@ -176,6 +178,7 @@ void ui_helpers_text_buffer_add_card(GtkTextBuffer *buffer,
     g_free(line);
   }
 
+  gtk_text_buffer_insert(buffer, iter, "\n", -1);
   insert_markup_text(buffer, iter, card->text);
   gtk_text_buffer_insert(buffer, iter, "\n", -1);
 
@@ -185,6 +188,7 @@ void ui_helpers_text_buffer_add_card(GtkTextBuffer *buffer,
   }
 
   if (card->illustrator != NULL) {
+    gtk_text_buffer_insert(buffer, iter, "\n", -1);
     gchar *illustrator = g_strdup_printf("Illustrator: %s\n",
                                          card->illustrator);
     gtk_text_buffer_insert(buffer, iter, illustrator, -1);
