@@ -1,12 +1,12 @@
 ## Process this file with automake to generate Makefile.in
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(GTK3_CFLAGS) $(Jansson_CFLAGS)
-AM_CPPFLAGS = -I$(srcdir)/src
+AM_CPPFLAGS = -I$(srcdir)/src -DDEFAULT_DATA_DIR=\"$(pkgdatadir)\"
 LDADD = $(GTK3_LIBS) $(Jansson_LIBS)
 
 bin_PROGRAMS = cyberfeeder
 CLEANFILES = src/hash_card_type.c src/hash_faction_name.c
-EXTRA_DIST = data/00_Core.json
+EXTRA_DIST = data/cards/00_Core.json data/cards/01_What_Lies_Ahead.json
 
 cyberfeeder_SOURCES = \
 	src/card.c \
