@@ -45,9 +45,12 @@ static GtkWidget* setup_card_text_pane(GtkTextBuffer **buffer) {
   gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(text_view), FALSE);
   gtk_container_set_border_width(GTK_CONTAINER(text_view), 5);
 
+  GtkWidget *scroller = gtk_scrolled_window_new(NULL, NULL);
+  gtk_container_add(GTK_CONTAINER(scroller), text_view);
+
   GtkWidget *frame = gtk_frame_new(NULL);
   gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
-  gtk_container_add(GTK_CONTAINER(frame), text_view);
+  gtk_container_add(GTK_CONTAINER(frame), scroller);
   return frame;
 }
 
