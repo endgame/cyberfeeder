@@ -39,7 +39,10 @@ int main(int argc, char *argv[]) {
   gtk_window_set_default_size(GTK_WINDOW(window), 700, 300);
   g_signal_connect (window, "destroy", G_CALLBACK (gtk_main_quit), NULL);
 
-  gtk_container_add(GTK_CONTAINER(window), the_toolbox());
+  GtkWidget *notebook = gtk_notebook_new();
+  gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
+                           the_toolbox(), gtk_label_new("The Toolbox"));
+  gtk_container_add(GTK_CONTAINER(window), notebook);
   gtk_widget_show_all(window);
   gtk_main();
   card_set_free(set);
