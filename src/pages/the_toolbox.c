@@ -74,6 +74,7 @@ static GtkWidget* setup_card_list_pane(GtkTextBuffer *text_buffer) {
                                            G_TYPE_STRING, /* set */
                                            G_TYPE_INT,    /* number */
                                            G_TYPE_POINTER /* struct card* */);
+  /* Build the list store. */
   for (guint i = 0; i < DB->sets->len; i++) {
     struct card_set *set = g_ptr_array_index(DB->sets, i);
     for (guint j = 0; j < set->cards->len; j++) {
@@ -92,42 +93,34 @@ static GtkWidget* setup_card_list_pane(GtkTextBuffer *text_buffer) {
       g_free(name);
     }
   }
+
+  /* Build the actual tree view. */
   GtkWidget *tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
-  gtk_tree_view_append_column
-    (GTK_TREE_VIEW(tree_view),
-     gtk_tree_view_column_new_with_attributes("Name",
-                                              gtk_cell_renderer_text_new(),
-                                              "text",
-                                              COL_NAME,
-                                              NULL));
-  gtk_tree_view_append_column
-    (GTK_TREE_VIEW(tree_view),
-     gtk_tree_view_column_new_with_attributes("Faction",
-                                              gtk_cell_renderer_text_new(),
-                                              "text",
-                                              COL_FACTION,
-                                              NULL));
-  gtk_tree_view_append_column
-    (GTK_TREE_VIEW(tree_view),
-     gtk_tree_view_column_new_with_attributes("Type",
-                                              gtk_cell_renderer_text_new(),
-                                              "text",
-                                              COL_TYPE,
-                                              NULL));
-  gtk_tree_view_append_column
-    (GTK_TREE_VIEW(tree_view),
-     gtk_tree_view_column_new_with_attributes("Set",
-                                              gtk_cell_renderer_text_new(),
-                                              "text",
-                                              COL_SET,
-                                              NULL));
-  gtk_tree_view_append_column
-    (GTK_TREE_VIEW(tree_view),
-     gtk_tree_view_column_new_with_attributes("Number",
-                                              gtk_cell_renderer_text_new(),
-                                              "text",
-                                              COL_NUMBER,
-                                              NULL));
+  GtkTreeViewColumn *column;
+  static const struct {
+    const char *name; gint column;
+  } *p, table[] = {
+    { "Name"   , COL_NAME    },
+    { "Faction", COL_FACTION },
+    { "Type"   , COL_TYPE    },
+    { "Set"    , COL_SET     },
+    { "Number" , COL_NUMBER  },
+    { NULL     , -1          }
+  };
+  for (p = table; p->name != NULL; p++) {
+    column =
+      gtk_tree_view_column_new_with_attributes(p->name,
+                                               gtk_cell_renderer_text_new(),
+                                               "text", p->column,
+                                               NULL);
+    if (p->column == COL_NAME
+        || p->column == COL_TYPE
+        || p->column == COL_SET) {
+      gtk_tree_view_column_set_resizable(column, TRUE);
+    }
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
+  }
+
   GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
   gtk_tree_selection_set_mode(sel, GTK_SELECTION_BROWSE);
   g_signal_connect_object(sel,
