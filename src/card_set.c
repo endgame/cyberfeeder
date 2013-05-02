@@ -44,7 +44,7 @@ void card_set_free(struct card_set *set) {
 }
 
 static struct card* fill_card(struct card *card, json_t *j_card) {
-  gint8 agenda_points, base_link, influence_cost, max_influence,
+  gint8 agenda_points, base_link, influence_cost = 0, max_influence,
     memory_cost, min_decksize, strength, trash_cost;
   const struct {
     const char *field;

@@ -81,16 +81,14 @@ static GtkWidget* setup_card_list_pane(GtkTextBuffer *text_buffer) {
       struct card *card = g_ptr_array_index(set->cards, j);
       GtkTreeIter iter;
       gtk_list_store_append(store, &iter);
-      gchar *name = card_render_name(card);
       gtk_list_store_set(store, &iter,
-                         COL_NAME, name,
+                         COL_NAME, card->name,
                          COL_FACTION, faction_to_string(card->faction),
                          COL_TYPE, card->type_str,
                          COL_SET, card->set,
                          COL_NUMBER, card->number,
                          COL_CARD_PTR, card,
                          -1);
-      g_free(name);
     }
   }
 

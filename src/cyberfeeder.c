@@ -31,8 +31,8 @@ int main(int argc, char *argv[]) {
   gtk_init(&argc, &argv);
 
   DB = card_db_new();
-  struct card_set *set = card_set_load_file("data/00_Core.json");
-  card_db_add_set(DB, set);
+  card_db_add_set(DB, card_set_load_file("data/00_Core.json"));
+  card_db_add_set(DB, card_set_load_file("data/01_What_Lies_Ahead.json"));
 
   GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title(GTK_WINDOW(window), "Cyberfeeder");
@@ -45,6 +45,7 @@ int main(int argc, char *argv[]) {
   gtk_container_add(GTK_CONTAINER(window), notebook);
   gtk_widget_show_all(window);
   gtk_main();
-  card_set_free(set);
+  card_db_free(DB);
+  DB = NULL;
   return 0;
 }

@@ -77,7 +77,7 @@ struct card* card_new(enum faction faction,
 
   card->cost = NULL;
   card->agenda_points = -1;
-  card->influence_cost = -1;
+  card->influence_cost = card_is_neutral(card) ? 0 : -1;
   card->trash_cost = -1;
   card->memory_cost = -1;
   card->strength = -1;
@@ -267,7 +267,9 @@ gboolean card_has_cost(const struct card *card) {
 gboolean card_has_influence_cost(const struct card *card) {
   return (card->type != RUNNER_ID
           && card->type != CORP_ID
-          && card->type != CORP_AGENDA);
+          && card->type != CORP_AGENDA
+          && card->faction != RUNNER_NEUTRAL
+          && card->faction != CORP_NEUTRAL);
 }
 
 gboolean card_has_max_influence(const struct card *card) {
