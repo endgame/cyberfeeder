@@ -111,6 +111,7 @@ static GtkWidget* setup_card_list_pane(GtkTextBuffer *text_buffer) {
                                                gtk_cell_renderer_text_new(),
                                                "text", p->column,
                                                NULL);
+    gtk_tree_view_column_set_sort_column_id(column, p->column);
     if (p->column == COL_NAME
         || p->column == COL_TYPE
         || p->column == COL_SET) {
