@@ -43,6 +43,7 @@ static GtkWidget* setup_card_text_pane(GtkTextBuffer **buffer) {
   gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text_view), GTK_WRAP_WORD);
   gtk_text_view_set_editable(GTK_TEXT_VIEW(text_view), FALSE);
   gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(text_view), FALSE);
+  gtk_container_set_border_width(GTK_CONTAINER(text_view), 5);
 
   GtkWidget *frame = gtk_frame_new(NULL);
   gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
@@ -154,7 +155,7 @@ GtkWidget* the_toolbox(void) {
   GtkWidget *list_pane = setup_card_list_pane(text_buffer);
   gtk_widget_set_size_request(list_pane, 400, -1);
   GtkWidget *paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
-  gtk_paned_pack1(GTK_PANED(paned), list_pane, TRUE, TRUE);
+  gtk_paned_pack1(GTK_PANED(paned), list_pane, TRUE, FALSE);
   gtk_paned_pack2(GTK_PANED(paned), text_pane, FALSE, FALSE);
   return paned;
 }
