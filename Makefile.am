@@ -8,7 +8,8 @@ cardsdir = $(pkgdatadir)/cards
 dist_cards_DATA = \
 	data/cards/00_Core.json \
 	data/cards/01_What_Lies_Ahead.json \
-	data/cards/02_Trace_Amount.json
+	data/cards/02_Trace_Amount.json \
+	data/cards/03_Cyber_Exodus.json
 
 bin_PROGRAMS = cyberfeeder
 CLEANFILES = src/hash_card_type.c src/hash_faction_name.c
