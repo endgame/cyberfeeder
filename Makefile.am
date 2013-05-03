@@ -5,7 +5,10 @@ AM_CPPFLAGS = -I$(srcdir)/src -DDEFAULT_DATA_DIR=\"$(pkgdatadir)\"
 LDADD = $(GTK3_LIBS) $(Jansson_LIBS)
 
 cardsdir = $(pkgdatadir)/cards
-dist_cards_DATA = data/cards/00_Core.json data/cards/01_What_Lies_Ahead.json
+dist_cards_DATA = \
+	data/cards/00_Core.json \
+	data/cards/01_What_Lies_Ahead.json \
+	data/cards/02_Trace_Amount.json
 
 bin_PROGRAMS = cyberfeeder
 CLEANFILES = src/hash_card_type.c src/hash_faction_name.c
