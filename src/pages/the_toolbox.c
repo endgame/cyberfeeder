@@ -66,6 +66,11 @@ static void cursor_changed(GtkTreeSelection *sel, gpointer user_data) {
   text_buffer_add_card(buffer, &end, card);
 }
 
+static void realize(GtkWidget *widget, gpointer user_data) {
+  (void)user_data;
+  gtk_widget_grab_focus(widget);
+}
+
 static GtkWidget* setup_card_list_pane(GtkTextBuffer *text_buffer) {
   GtkListStore *store = gtk_list_store_new(N_COLS,
                                            G_TYPE_STRING, /* name */
@@ -94,6 +99,7 @@ static GtkWidget* setup_card_list_pane(GtkTextBuffer *text_buffer) {
 
   /* Build the actual tree view. */
   GtkWidget *tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+  g_signal_connect(tree_view, "realize", G_CALLBACK(realize), NULL);
   static const struct {
     const char *name; gint column;
   } *p, table[] = {
