@@ -35,7 +35,8 @@ static void read_db(void) {
   GDir *dir = g_dir_open(card_dir, 0, NULL);
   g_assert(dir != NULL);
 
-  GPtrArray /* of gchar* */ *files = g_ptr_array_new_with_free_func(g_free);
+  GPtrArray /* of gchar*, owned */ *files =
+    g_ptr_array_new_with_free_func(g_free);
   for (const gchar *file = g_dir_read_name(dir);
        file != NULL;
        file = g_dir_read_name(dir)) {
