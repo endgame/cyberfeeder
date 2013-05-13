@@ -15,15 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef UI_HELPERS_H
-#define UI_HELPERS_H
+/* Utility functions for GtkTextView and GtkTextBuffer. */
+
+#ifndef TEXT_VIEW_HELPERS_H
+#define TEXT_VIEW_HELPERS_H
 
 #include <gtk/gtk.h>
 
 struct card;
 
-void ui_helpers_text_buffer_add_card(GtkTextBuffer *buffer,
-                                     GtkTextIter *iter,
-                                     const struct card *card);
+void text_buffer_add_card(GtkTextBuffer *buffer,
+                          GtkTextIter *iter,
+                          const struct card *card);
+
+/* Insert pango-style markup. */
+void text_buffer_insert_markup(GtkTextBuffer *buffer,
+                               GtkTextIter *iter,
+                               const gchar *markup);
+
+GtkTextView *text_view_make_uneditable(GtkTextView *view);
 
 #endif

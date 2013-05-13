@@ -10,6 +10,7 @@ dist_cards_DATA = \
 	data/cards/01_What_Lies_Ahead.json \
 	data/cards/02_Trace_Amount.json \
 	data/cards/03_Cyber_Exodus.json \
+	data/cards/04_A_Study_in_Static.json \
 	data/cards/05_Humanitys_Shadow.json
 
 bin_PROGRAMS = cyberfeeder
@@ -28,8 +29,9 @@ cyberfeeder_SOURCES = \
 	src/hash_faction_name.gperf \
 	src/pages.h \
 	src/pages/the_toolbox.c \
-	src/ui_helpers.c \
-	src/ui_helpers.h
+	src/pages/tmi.c \
+	src/text_view_helpers.c \
+	src/text_view_helpers.h
 
 .gperf.c:
 	$(AM_V_GEN)$(GPERF) $< > $@

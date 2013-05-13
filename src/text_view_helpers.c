@@ -18,7 +18,7 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include "ui_helpers.h"
+#include "text_view_helpers.h"
 
 #include <string.h>
 
@@ -32,9 +32,9 @@
 
    [1]: https://bugzilla.gnome.org/show_bug.cgi?id=59390 */
 
-void insert_markup_text(GtkTextBuffer *buffer,
-                        GtkTextIter *iter,
-                        const gchar *markup) {
+void text_buffer_insert_markup(GtkTextBuffer *buffer,
+                               GtkTextIter *iter,
+                               const gchar *markup) {
   PangoAttrList *attr_list;
   gchar *text;
   // TODO: error detection and logging.
@@ -119,9 +119,17 @@ void insert_markup_text(GtkTextBuffer *buffer,
   g_free(text);
 }
 
-void ui_helpers_text_buffer_add_card(GtkTextBuffer *buffer,
-                                     GtkTextIter *iter,
-                                     const struct card *card) {
+GtkTextView *text_view_make_uneditable(GtkTextView *text_view) {
+  gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text_view), GTK_WRAP_WORD);
+  gtk_text_view_set_editable(GTK_TEXT_VIEW(text_view), FALSE);
+  gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(text_view), FALSE);
+  gtk_container_set_border_width(GTK_CONTAINER(text_view), 5);
+  return text_view;
+}
+
+void text_buffer_add_card(GtkTextBuffer *buffer,
+                          GtkTextIter *iter,
+                          const struct card *card) {
   g_assert(buffer != NULL);
   g_assert(card != NULL);
 
@@ -136,7 +144,7 @@ void ui_helpers_text_buffer_add_card(GtkTextBuffer *buffer,
                                   faction_to_string(card->faction),
                                   card->type_str);
   g_free(name);
-  insert_markup_text(buffer, iter, header);
+  text_buffer_insert_markup(buffer, iter, header);
   g_free(header);
 
   if (strcmp(card->set, "Core") == 0) {
@@ -179,11 +187,11 @@ void ui_helpers_text_buffer_add_card(GtkTextBuffer *buffer,
   }
 
   gtk_text_buffer_insert(buffer, iter, "\n", -1);
-  insert_markup_text(buffer, iter, card->text);
+  text_buffer_insert_markup(buffer, iter, card->text);
   gtk_text_buffer_insert(buffer, iter, "\n", -1);
 
   if (card->flavor != NULL) {
-    insert_markup_text(buffer, iter, card->flavor);
+    text_buffer_insert_markup(buffer, iter, card->flavor);
     gtk_text_buffer_insert(buffer, iter, "\n", -1);
   }
 

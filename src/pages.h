@@ -26,4 +26,7 @@
 /* The Toolbox - Card Browser */
 GtkWidget* the_toolbox(void);
 
+/* TMI - GPL Warranty Disclaimer */
+GtkWidget* tmi(void);
+
 #endif

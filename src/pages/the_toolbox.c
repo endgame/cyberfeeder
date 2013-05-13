@@ -23,7 +23,7 @@
 #include "card.h"
 #include "card_db.h"
 #include "card_set.h"
-#include "ui_helpers.h"
+#include "text_view_helpers.h"
 
 extern struct card_db *DB;
 
@@ -38,15 +38,12 @@ enum card_list_columns {
 };
 
 static GtkWidget* setup_card_text_pane(GtkTextBuffer **buffer) {
-  GtkWidget *text_view = gtk_text_view_new();
-  *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
-  gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text_view), GTK_WRAP_WORD);
-  gtk_text_view_set_editable(GTK_TEXT_VIEW(text_view), FALSE);
-  gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(text_view), FALSE);
-  gtk_container_set_border_width(GTK_CONTAINER(text_view), 5);
+  GtkTextView *text_view =
+    text_view_make_uneditable(GTK_TEXT_VIEW(gtk_text_view_new()));
+  *buffer = gtk_text_view_get_buffer(text_view);
 
   GtkWidget *scroller = gtk_scrolled_window_new(NULL, NULL);
-  gtk_container_add(GTK_CONTAINER(scroller), text_view);
+  gtk_container_add(GTK_CONTAINER(scroller), GTK_WIDGET(text_view));
 
   GtkWidget *frame = gtk_frame_new(NULL);
   gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
@@ -66,7 +63,7 @@ static void cursor_changed(GtkTreeSelection *sel, gpointer user_data) {
   gtk_text_buffer_get_start_iter(buffer, &start);
   gtk_text_buffer_get_end_iter(buffer, &end);
   gtk_text_buffer_delete(buffer, &start, &end);
-  ui_helpers_text_buffer_add_card(buffer, &end, card);
+  text_buffer_add_card(buffer, &end, card);
 }
 
 static GtkWidget* setup_card_list_pane(GtkTextBuffer *text_buffer) {

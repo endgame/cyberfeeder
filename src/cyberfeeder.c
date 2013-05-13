@@ -91,6 +91,8 @@ int main(int argc, char *argv[]) {
   GtkWidget *notebook = gtk_notebook_new();
   gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
                            the_toolbox(), gtk_label_new("The Toolbox"));
+  gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
+                           tmi(), gtk_label_new("TMI"));
   gtk_container_add(GTK_CONTAINER(window), notebook);
   gtk_widget_show_all(window);
   gtk_main();
