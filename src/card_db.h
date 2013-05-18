@@ -20,7 +20,7 @@
 #ifndef CARD_DB_H
 #define CARD_DB_H
 
-#include <gtk/gtk.h>
+#include <glib.h>
 
 struct card_set;
 
