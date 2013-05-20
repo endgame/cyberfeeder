@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.67])
-AC_INIT([cyberfeeder], [0], [jack@jackkelly.name])
+AC_INIT([Cyberfeeder], [0], [jack@jackkelly.name])
 AC_CONFIG_AUX_DIR([auxfiles])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])

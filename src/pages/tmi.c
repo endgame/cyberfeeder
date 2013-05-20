@@ -30,7 +30,7 @@ GtkWidget* tmi(void) {
   gtk_text_buffer_get_start_iter(buffer, &iter);
   text_buffer_insert_markup
     (buffer, &iter,
-     "<big>Cyberfeeder - a utility for Android:Netrunner</big>\n"
+     "<big>" PACKAGE_STRING " - a utility for Android:Netrunner</big>\n"
      "Copyright (C) 2013  Jack Kelly\n"
      "This program comes with <b>ABSOLUTELY NO WARRANTY</b>.\n"
      "This is free software, and you are welcome to redistribute it "
