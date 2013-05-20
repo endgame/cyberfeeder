@@ -90,30 +90,58 @@ struct card* card_new(enum faction faction,
   return card;
 }
 
-// TODO: log errors and such on fill funcs
 static struct card* card_fill_id(struct card *card,
                                  gint8 min_decksize,
                                  gint8 max_influence) {
-  g_assert(card->type == RUNNER_ID || card->type == CORP_ID);
-  g_assert(!card_is_neutral(card));
-  g_assert(min_decksize >= 0);
-  g_assert(max_influence >= 0);
+  if (card->type != RUNNER_ID && card->type != CORP_ID) {
+    load_error_card(card, "Must be an \"Identity\" card");
+    goto err;
+  }
+  if (card_is_neutral(card)) {
+    load_error_card(card, "Identities cannot be neutral");
+    goto err;
+  }
+  if (min_decksize < 0) {
+    load_error_card(card, "Minimum deck size must be positive, got %d",
+                    min_decksize);
+    goto err;
+  }
+  if (max_influence < 0) {
+    load_error_card(card, "Maximum influence must be positive, got %d",
+                    max_influence);
+    goto err;
+  }
 
   card->min_decksize = min_decksize;
   card->max_influence = max_influence;
   return card;
+ err:
+  card_free(card);
+  return NULL;
 }
 
 struct card* card_fill_runner_id(struct card *card,
                                  gint8 min_decksize,
                                  gint8 max_influence,
                                  gint8 base_link) {
-  g_assert(card_is_runner(card));
-  g_assert(card->type == RUNNER_ID);
-  g_assert(base_link >= 0);
+  if (!card_is_runner(card)) {
+    load_error_card(card, "Must belong to a Runner faction");
+    goto err;
+  }
+  if (card->type != RUNNER_ID) {
+    load_error_card(card, "Must be a Runner Identity card");
+    goto err;
+  }
+  if (base_link < 0) {
+    load_error_card(card, "Base link must be positive, got %d", base_link);
+    goto err;
+  }
 
   card->base_link = base_link;
   return card_fill_id(card, min_decksize, max_influence);
+ err:
+  card_free(card);
+  return NULL;
 }
 
 /* Either "X" or totally composed of digits. */
@@ -128,39 +156,82 @@ static gboolean is_valid_cost(const gchar *cost) {
 struct card* card_fill_costed(struct card *card,
                               const gchar *cost,
                               gint8 influence_cost) {
-  g_assert((card_is_runner(card) && (card->type == RUNNER_EVENT
-                                     || card->type == RUNNER_HARDWARE
-                                     || card->type == RUNNER_PROGRAM
-                                     || card->type == RUNNER_ICEBREAKER
-                                     || card->type == RUNNER_RESOURCE))
-           || (card_is_corp(card) && (card->type == CORP_ASSET
-                                      || card->type == CORP_UPGRADE
-                                      || card->type == CORP_OPERATION
-                                      || card->type == CORP_ICE)));
-  g_assert(cost != NULL && is_valid_cost(cost));
-  if (card_is_neutral(card)) {
-    g_assert(influence_cost == 0);
+  if (card_is_runner(card)) {
+    if (card->type != RUNNER_EVENT
+        && card->type != RUNNER_HARDWARE
+        && card->type != RUNNER_PROGRAM
+        && card->type != RUNNER_ICEBREAKER
+        && card->type != RUNNER_RESOURCE) {
+      load_error_card(card,
+                      "Costed Runner cards must be events, hardware,"
+                      " programs, icebreakers or resources");
+      goto err;
+    }
   } else {
-    g_assert(influence_cost > 0);
+    if (card->type != CORP_ASSET
+        && card->type != CORP_UPGRADE
+        && card->type != CORP_OPERATION
+        && card->type != CORP_ICE) {
+      load_error_card(card,
+                      "Costed Corp cards must be assets, upgrades,"
+                      " operations or ICE.");
+      goto err;
+    }
+  }
+  if (cost == NULL || !is_valid_cost(cost)) {
+    load_error_card
+      (card, "Invalid cost, must be a positive integer or \"X\", got %s", cost);
+    goto err;
+  }
+  if (card_is_neutral(card)) {
+    if (influence_cost != 0) {
+      load_error_card
+        (card, "Influence cost for neutral cards must be 0, got %d",
+         influence_cost);
+      goto err;
+    }
+  } else {
+    if (influence_cost < 0) {
+      load_error_card
+        (card, "Influence cost for non-neutral cards must be positive, got %d",
+         influence_cost);
+      goto err;
+    }
   }
 
   if (card->cost != NULL) g_free(card->cost);
   card->cost = g_strdup(cost);
   card->influence_cost = influence_cost;
   return card;
+
+ err:
+  card_free(card);
+  return NULL;
 }
 
 struct card* card_fill_program(struct card *card,
                                const gchar *cost,
                                gint8 influence_cost,
                                gint8 memory_cost) {
-  g_assert(card_is_runner(card));
-  g_assert(card->type == RUNNER_PROGRAM
-           || card->type == RUNNER_ICEBREAKER);
-  g_assert(memory_cost > 0);
+  if (!card_is_runner(card)) {
+    load_error_card(card, "Only Runner factions can have programs");
+    goto err;
+  }
+  if (card->type != RUNNER_PROGRAM && card->type != RUNNER_ICEBREAKER) {
+    load_error_card(card, "Must have type \"Program\"");
+    goto err;
+  }
+  if (memory_cost < 1) {
+    load_error_card(card,
+                    "Memory cost must be at least 1, got %d", memory_cost);
+    goto err;
+  };
 
   card->memory_cost = memory_cost;
   return card_fill_costed(card, cost, influence_cost);
+ err:
+  card_free(card);
+  return NULL;
 }
 
 struct card* card_fill_icebreaker(struct card *card,
@@ -168,60 +239,117 @@ struct card* card_fill_icebreaker(struct card *card,
                                   gint8 influence_cost,
                                   gint8 memory_cost,
                                   gint8 strength) {
-  g_assert(card->type == RUNNER_ICEBREAKER);
-  g_assert(strength >= 0);
+  if (card->type != RUNNER_ICEBREAKER) {
+    load_error_card(card, "Must be a \"Program: Icebreaker\" card");
+    goto err;
+  }
+  if (strength < 0) {
+    load_error_card(card, "Strength must be non-negative, got %d", strength);
+    goto err;
+  }
 
   card->strength = strength;
   return card_fill_program(card, cost, influence_cost, memory_cost);
+ err:
+  card_free(card);
+  return NULL;
 }
 
 struct card* card_fill_corp_id(struct card *card,
                                gint8 min_decksize,
                                gint8 max_influence) {
-  g_assert(card_is_corp(card));
-  g_assert(card->type == CORP_ID);
+  if (!card_is_corp(card)) {
+    load_error_card(card, "Must belong to a Corp faction");
+    goto err;
+  }
+  if (card->type != CORP_ID) {
+    load_error_card(card, "Must be a Corp Identity card");
+    goto err;
+  }
 
   return card_fill_id(card, min_decksize, max_influence);
+ err:
+  card_free(card);
+  return NULL;
 }
 
 struct card* card_fill_agenda(struct card *card,
                               const gchar *cost,
                               gint8 agenda_points) {
-  g_assert(card_is_corp(card));
-  g_assert(card->type == CORP_AGENDA);
+  if (!card_is_corp(card)) {
+    load_error_card(card, "Must belong to a corp faction");
+    goto err;
+  }
+  if (card->type != CORP_AGENDA) {
+    load_error_card(card, "Must have type \"Agenda\"");
+    goto err;
+  }
   errno = 0;
   char* end;
   gint64 i_cost = g_ascii_strtoll(cost, &end, 10);
-  g_assert(errno == 0 && i_cost > 0 && *end == '\0');
-  g_assert(agenda_points > 0);
+  if (errno != 0 || i_cost <= 0 || *end != '\0') {
+    load_error_card(card,
+                    "Agenda costs must be a positive number, got %s", cost);
+    goto err;
+  }
+  if (agenda_points <= 0) {
+    load_error_card(card,
+                    "Agendas must be worth at least 1 agenda point, got %d",
+                    agenda_points);
+  }
 
   if (card->cost != NULL) g_free(card->cost);
   card->cost = g_strdup(cost);
   card->agenda_points = agenda_points;
   return card;
+ err:
+  card_free(card);
+  return NULL;
 }
 
 struct card* card_fill_asset_upgrade(struct card *card,
                                      const gchar *cost,
                                      gint8 influence_cost,
                                      gint8 trash_cost) {
-  g_assert(card_is_corp(card));
-  g_assert(card->type == CORP_ASSET
-           || card->type == CORP_UPGRADE);
+  if (!card_is_corp(card)) {
+    load_error_card(card, "Only Corp factions can have assets/upgrades");
+    goto err;
+  }
+  if (card->type != CORP_ASSET && card->type != CORP_UPGRADE) {
+    load_error_card(card, "Must have type \"Asset\" or \"Upgrade\"");
+    goto err;
+  }
+  if (trash_cost < 0) {
+    load_error_card(card,
+                    "Trash cost must be non-negative, got %d", trash_cost);
+    goto err;
+  }
 
   card->trash_cost = trash_cost;
   return card_fill_costed(card, cost, influence_cost);
+ err:
+  card_free(card);
+  return NULL;
 }
 
 struct card* card_fill_ice(struct card *card,
                            const gchar *cost,
                            gint8 influence_cost,
                            gint8 strength) {
-  g_assert(card_is_corp(card));
-  g_assert(card->type == CORP_ICE);
+  if (!card_is_corp(card)) {
+    load_error_card(card, "Only Corp factions can have ice");
+    goto err;
+  }
+  if (card->type != CORP_ICE) {
+    load_error_card(card, "Must have type \"ICE\"");
+    goto err;
+  }
 
   card->strength = strength;
   return card_fill_costed(card, cost, influence_cost);
+ err:
+  card_free(card);
+  return NULL;
 }
 
 void card_free(struct card *card) {

@@ -20,6 +20,8 @@
 #endif
 #include "load_error.h"
 
+#include "card.h"
+
 static GPtrArray /* of gchar*, owned */ *errors = NULL;
 static GQueue /* of gchar*, owned */ sources = G_QUEUE_INIT;
 
@@ -63,7 +65,16 @@ void load_error(const char *format, ...) {
 }
 
 void load_error_card(const struct card *card,
-                     const char *format, ...);
+                     const char *format, ...) {
+  setup();
+  va_list args;
+  va_start(args, format);
+  gchar *msg = g_strdup_vprintf(format, args);
+  va_end(args);
+
+  g_ptr_array_add(errors, g_strconcat(card->name, ": ", msg, NULL));
+  g_free(msg);
+}
 
 /* Show all errors in a dialog, then free allocated memory. */
 void load_error_show(void) {
