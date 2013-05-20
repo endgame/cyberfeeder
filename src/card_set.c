@@ -22,9 +22,12 @@
 
 #include <glib/gprintf.h>
 #include <jansson.h>
+#include <pango/pango.h>
 
 #include "card.h"
 #include "hash.h"
+#include "json.h"
+#include "load_error.h"
 
 static void free_card(gpointer p) { card_free(p); }
 
@@ -62,11 +65,10 @@ static struct card* fill_card(struct card *card, json_t *j_card) {
     { NULL            , NULL           , NULL                    }
   };
 
-  // TODO: something better than g_assert().
   for (p = field_table; p->field != NULL; p++) {
     if (!p->predicate(card)) continue;
-    json_t *json_obj = json_object_get(j_card, p->field);
-    g_assert(json_is_integer(json_obj));
+    json_t *json_obj = json_object_get_checked(j_card, p->field, JSON_INTEGER);
+    if (json_obj == NULL) return NULL;
     *p->p_int = json_integer_value(json_obj);
   }
 
@@ -80,13 +82,11 @@ static struct card* fill_card(struct card *card, json_t *j_card) {
                                sizeof(cost_buf),
                                "%" JSON_INTEGER_FORMAT,
                                json_integer_value(j_cost));
-      // TODO: Something better than g_assert().
       g_assert(count < sizeof(cost_buf));
       cost = cost_buf;
     } else if (json_is_string(j_cost)) {
       cost = json_string_value(j_cost);
     } else {
-      // TODO: Something better than g_assert().
       g_assert_not_reached();
     }
   }
@@ -125,96 +125,133 @@ static struct card* fill_card(struct card *card, json_t *j_card) {
 }
 
 static struct card* load_card(json_t *j_card, const char *set_name) {
-  json_t *j_faction = json_object_get(j_card, "faction");
-  // TODO: something better than g_assert().
-  g_assert(json_is_string(j_faction));
+  g_assert(set_name != NULL);
+  json_t *j_faction = json_object_get_checked(j_card, "faction", JSON_STRING);
+  if (j_faction == NULL) goto err_0;
+
   const char *str_faction = json_string_value(j_faction);
   enum faction faction;
   gboolean ok = hash_faction_name(str_faction, &faction);
-  g_assert(ok);
-
-  json_t *j_type = json_object_get(j_card, "type");
-  g_assert(json_is_string(j_type));
-
-  json_t *j_number = json_object_get(j_card, "number");
-  g_assert(json_is_integer(j_number));
-
-  json_t *j_quantity = json_object_get(j_card, "quantity");
-  gint8 quantity = 3;
-  if (j_quantity != NULL) {
-    g_assert(json_is_integer(j_quantity));
-    quantity = json_integer_value(j_quantity);
+  if (!ok) {
+    load_error(".faction: Invalid faction \"%s\"", str_faction);
+    goto err_0;
   }
 
-  json_t *j_unique = json_object_get(j_card, "unique");
-  gboolean unique = FALSE;
-  if (j_unique != NULL) {
-    g_assert(json_is_boolean(j_unique));
-    unique = json_is_true(j_unique);
+  json_t *j_type = json_object_get_checked(j_card, "type", JSON_STRING);
+  if (j_type == NULL) goto err_0;
+
+  json_t *j_number = json_object_get_checked(j_card, "number", JSON_INTEGER);
+  if (j_number == NULL) goto err_0;
+  json_int_t number = json_integer_value(j_number);
+  if (number < 0) {
+    load_error(".number: Should be positive, got %" JSON_INTEGER_FORMAT,
+               number);
+    goto err_0;
+  }
+  if (number > 255) {
+    load_error(".number: Should be <= 255, got %" JSON_INTEGER_FORMAT, number);
+    goto err_0;
   }
 
-  json_t *j_name = json_object_get(j_card, "name");
-  g_assert(json_is_string(j_name));
-
-  json_t *j_text = json_object_get(j_card, "text");
-  g_assert(json_is_string(j_text));
-
-  json_t *j_flavor = json_object_get(j_card, "flavor");
-  const char *flavor = NULL;
-  if (j_flavor != NULL) {
-    g_assert(json_is_string(j_flavor));
-    flavor = json_string_value(j_flavor);
+  gint8 quantity = json_object_get_int_default(j_card, "quantity", 3);
+  if (quantity < 0) {
+    load_error(".quantity: Should be positive, got %d", quantity);
+    goto err_0;
+  }
+  if (quantity > 3) {
+    load_error(".quantity: Should be <= 3, got %d", quantity);
+    goto err_0;
   }
 
-  json_t *j_illustrator = json_object_get(j_card, "illustrator");
-  const char* illustrator = NULL;
-  if (j_illustrator != NULL) {
-    g_assert(json_is_string(j_illustrator));
-    illustrator = json_string_value(j_illustrator);
+  gboolean unique = json_object_get_bool_default(j_card, "unique", FALSE);
+
+  json_t *j_name = json_object_get_checked(j_card, "name", JSON_STRING);
+  if (j_name == NULL) goto err_0;
+
+  GError *err = NULL;
+
+  json_t *j_text = json_object_get_checked(j_card, "text", JSON_STRING);
+  if (j_text == NULL) goto err_0;
+  const char *text = json_string_value(j_text);
+  if (!pango_parse_markup(text, -1, 0, NULL, NULL, NULL, &err)) {
+    load_error(".text: %s", err->message);
+    g_error_free(err);
+    goto err_0;
   }
+
+  gchar *flavor = json_object_get_string_maybe(j_card, "flavor");
+  if (flavor != NULL
+      && !pango_parse_markup(flavor, -1, 0, NULL, NULL, NULL, &err)) {
+    load_error(".flavor: %s", err->message);
+    g_error_free(err);
+    goto err_1;
+  }
+
+  gchar *illustrator = json_object_get_string_maybe(j_card, "illustrator");
 
   struct card *card = card_new(faction,
                                json_string_value(j_type),
                                set_name,
-                               json_integer_value(j_number),
+                               number,
                                quantity,
                                unique,
                                json_string_value(j_name),
-                               json_string_value(j_text),
+                               text,
                                flavor,
                                illustrator);
-
+  if (card == NULL) goto err_2;
+  g_free(flavor);
+  g_free(illustrator);
   return fill_card(card, j_card);
+
+ err_2:
+  g_free(illustrator);
+ err_1:
+  g_free(flavor);
+ err_0:
+  return NULL;
 }
 
 struct card_set* card_set_load_file(const gchar *path) {
   json_error_t err;
   json_t *j_set = json_load_file(path, 0, &err);
-  // TODO: Log properly.
-  if(!json_is_object(j_set)) {
-    printf("%s:%d:%d: %s\n", err.source, err.line, err.column, err.text);
+
+  if (j_set == NULL) {
+    load_error("%s (%d:%d): %s",
+               path, err.line, err.column, err.text);
+    goto err_0;
+  } else if (!json_is_object(j_set)) {
+    load_error("%s: Expected an object, got %s",
+               path, json_typename(json_typeof(j_set)));
+    goto err_1;
   }
-  // TODO: something better than g_assert().
-  g_assert(json_is_object(j_set));
 
-  json_t *j_set_name = json_object_get(j_set, "name");
-  g_assert(json_is_string(j_set_name));
+  json_t *j_set_name = json_object_get_checked(j_set, "name", JSON_STRING);
+  if (j_set_name == NULL) goto err_1;
   const char *set_name = json_string_value(j_set_name);
-  struct card_set* set = card_set_new(set_name);
-  g_message("Loading set: %s", set_name);
 
-  json_t *j_cards = json_object_get(j_set, "cards");
-  g_assert(json_is_array(j_cards));
+  json_t *j_cards = json_object_get_checked(j_set, "cards", JSON_ARRAY);
+  if (j_cards == NULL) goto err_1;
   gsize n = json_array_size(j_cards);
 
+  struct card_set* set = card_set_new(set_name);
+  g_message("Loading set: %s", set_name);
   for (uint i = 0; i < n; i++) {
-    json_t *j_card = json_array_get(j_cards, i);
-    g_assert(json_is_object(j_card));
-    struct card *card = load_card(j_card, set->name);
-    g_debug("Loaded card: %s", card->name);
-    g_ptr_array_add(set->cards, card);
+    json_t *j_card = json_array_get_checked(j_cards, i, JSON_OBJECT);
+    if (j_card == NULL) continue;
+
+    struct card * card = load_card(j_card, set->name);
+    if (card != NULL) {
+      g_debug("Loaded card: %s", card->name);
+      g_ptr_array_add(set->cards, card);
+    }
   }
 
   json_decref(j_set);
   return set;
+
+ err_1:
+  json_decref(j_set);
+ err_0:
+  return NULL;
 }

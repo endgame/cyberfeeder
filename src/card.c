@@ -24,6 +24,7 @@
 #include <string.h>
 
 #include "hash.h"
+#include "load_error.h"
 
 const gchar* faction_to_string(enum faction faction) {
   switch (faction) {
@@ -40,7 +41,6 @@ const gchar* faction_to_string(enum faction faction) {
   }
 }
 
-// TODO: Turn g_assert() into logic checks and log errors.
 struct card* card_new(enum faction faction,
                       const gchar *type,
                       const gchar *set,
@@ -58,19 +58,22 @@ struct card* card_new(enum faction faction,
   g_assert(name != NULL);
   g_assert(text != NULL);
 
+  enum card_type c_type;
+  gboolean ok = hash_card_type(type, faction, &c_type);
+  if (!ok) {
+    load_error(".type: Invalid card type \"%s\"", type);
+    return NULL;
+  }
+
   struct card *card = g_slice_new(struct card);
   card->faction = faction;
-
-  gboolean ok = hash_card_type(type, faction, &card->type);
-  /* TODO: Something better than g_assert(). */
-  g_assert(ok);
-
-  card->name = g_strdup(name);
+  card->type = c_type;
   card->type_str = g_strdup(type);
   card->set = set;
   card->number = number;
   card->quantity = quantity;
   card->unique = unique;
+  card->name = g_strdup(name);
   card->text = g_strdup(text);
   card->flavor = g_strdup(flavor);
   card->illustrator = g_strdup(illustrator);

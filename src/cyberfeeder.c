@@ -24,43 +24,23 @@
 
 #include "card_db.h"
 #include "card_set.h"
+#include "dir.h"
+#include "load_error.h"
 #include "pages.h"
 
 struct card_db *DB = NULL;
 gchar *DATA_DIR = NULL;
 
 static void read_db(void) {
-  gchar *card_dir = g_strconcat(DATA_DIR, G_DIR_SEPARATOR_S, "cards", NULL);
-  // TODO: Error checking!
-  GDir *dir = g_dir_open(card_dir, 0, NULL);
-  g_assert(dir != NULL);
-
-  GPtrArray /* of gchar*, owned */ *files =
-    g_ptr_array_new_with_free_func(g_free);
-  for (const gchar *file = g_dir_read_name(dir);
-       file != NULL;
-       file = g_dir_read_name(dir)) {
-    if (g_str_has_suffix(file, ".json")) {
-      g_ptr_array_add(files, g_strdup(file));
-    }
-  }
-  g_dir_close(dir);
-
-  gint cmp(gconstpointer a, gconstpointer b) {
-    return strcmp(*(gchar**)a, *(gchar**)b);
-  }
-  g_ptr_array_sort(files, cmp);
+  gchar *card_dir = g_build_filename(DATA_DIR, "cards", NULL);
+  GPtrArray *files = dir_list_json(card_dir);
+  if (files == NULL) return;
 
   DB = card_db_new();
   for (guint i = 0; i < files->len; i++) {
-    gchar *file = g_strconcat(card_dir,
-                              G_DIR_SEPARATOR_S,
-                              g_ptr_array_index(files, i),
-                              NULL);
-    // TODO: Error checking!
+    gchar *file = g_build_filename(card_dir, g_ptr_array_index(files, i), NULL);
     struct card_set *set = card_set_load_file(file);
-    g_assert(set != NULL);
-    card_db_add_set(DB, set);
+    if (set != NULL) card_db_add_set(DB, set);
     g_free(file);
   }
   g_ptr_array_free(files, TRUE);
@@ -83,6 +63,12 @@ int main(int argc, char *argv[]) {
   if (DATA_DIR == NULL) DATA_DIR = g_strdup(DEFAULT_DATA_DIR);
 
   read_db();
+  load_error_show();
+  if (DB == NULL) {
+    /* TODO: Error dialog */
+    puts("Failed to load DB.");
+    exit(EXIT_FAILURE);
+  }
 
   GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title(GTK_WINDOW(window), "Cyberfeeder");

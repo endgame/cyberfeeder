@@ -37,7 +37,6 @@ void text_buffer_insert_markup(GtkTextBuffer *buffer,
                                const gchar *markup) {
   PangoAttrList *attr_list;
   gchar *text;
-  // TODO: error detection and logging.
   gboolean ok =
     pango_parse_markup(markup, -1, 0, &attr_list, &text, NULL, NULL);
   g_assert(ok);

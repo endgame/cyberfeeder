@@ -24,9 +24,15 @@ cyberfeeder_SOURCES = \
 	src/card_set.c \
 	src/card_set.h \
 	src/cyberfeeder.c \
+	src/dir.c \
+	src/dir.h \
 	src/hash.h \
 	src/hash_card_type.gperf \
 	src/hash_faction_name.gperf \
+	src/json.c \
+	src/json.h \
+	src/load_error.c \
+	src/load_error.h \
 	src/pages.h \
 	src/pages/the_toolbox.c \
 	src/pages/tmi.c \
