@@ -65,8 +65,14 @@ int main(int argc, char *argv[]) {
   read_db();
   load_error_show();
   if (DB == NULL) {
-    /* TODO: Error dialog */
-    puts("Failed to load DB.");
+    GtkWidget *dialog = gtk_message_dialog_new(NULL,
+                                               GTK_DIALOG_MODAL,
+                                               GTK_MESSAGE_ERROR,
+                                               GTK_BUTTONS_CLOSE,
+                                               "Failed to load DB.");
+    gtk_window_set_title(GTK_WINDOW(dialog), "Error");
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
     exit(EXIT_FAILURE);
   }
 
