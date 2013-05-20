@@ -236,16 +236,20 @@ struct card_set* card_set_load_file(const gchar *path) {
 
   struct card_set* set = card_set_new(set_name);
   g_message("Loading set: %s", set_name);
+  load_error_push_source(".cards");
   for (uint i = 0; i < n; i++) {
     json_t *j_card = json_array_get_checked(j_cards, i, JSON_OBJECT);
     if (j_card == NULL) continue;
 
+    load_error_push_source("[%d]", i);
     struct card * card = load_card(j_card, set->name);
     if (card != NULL) {
       g_debug("Loaded card: %s", card->name);
       g_ptr_array_add(set->cards, card);
     }
+    load_error_pop_source();
   }
+  load_error_pop_source();
 
   json_decref(j_set);
   return set;

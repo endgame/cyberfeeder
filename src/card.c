@@ -90,6 +90,7 @@ struct card* card_new(enum faction faction,
   return card;
 }
 
+// TODO: log errors and such on fill funcs
 static struct card* card_fill_id(struct card *card,
                                  gint8 min_decksize,
                                  gint8 max_influence) {

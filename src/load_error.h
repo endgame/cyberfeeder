@@ -24,6 +24,9 @@
 
 struct card;
 
+void load_error_push_source(const char *format, ...) G_GNUC_PRINTF(1, 2);
+void load_error_pop_source(void);
+
 void load_error(const char *format, ...) G_GNUC_PRINTF(1, 2);
 void load_error_card(const struct card *card,
                      const char *format, ...) G_GNUC_PRINTF(2, 3);
