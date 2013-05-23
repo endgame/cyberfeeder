@@ -195,7 +195,7 @@
       "cost": 3,
       "influence_cost": 2,
       "strength": 3,
-      "text": "[Subroutine] <b>Trace<sup>3</sup></b>- If successful, the Corp gains 3[Credits].\n[Subroutine] <b>Trace<sup>3</sup></b>- If successful, end the run.",
+      "text": "[Subroutine] <b>Trace<sup>3</sup></b>- If successful, the Corp gains 3[Credits].\n[Subroutine] <b>Trace<sup>2</sup></b>- If successful, end the run.",
       "flavor": "<i>A symbol of commerce, but beware its bite.</i>",
       "illustrator": "Christina Davis"},
 
