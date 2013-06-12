@@ -185,7 +185,7 @@ struct card* card_fill_costed(struct card *card,
       goto err;
     }
   } else {
-    if (influence_cost < 0) {
+    if (influence_cost <= 0) {
       load_error_card
         (card, "Influence cost for non-neutral cards must be positive, got %d",
          influence_cost);
