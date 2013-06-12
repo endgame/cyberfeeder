@@ -1,0 +1,6 @@
+Version numbering:
+
+The format is major.minor.update. Major is 0 during development. Once
+cyberfeeder is feature-complete, version 1.0.0 will be released. When
+a new feature is added, increment minor and set update to 0. Update is
+incremented if the release only adds data (e.g., new data pack).
