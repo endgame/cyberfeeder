@@ -78,7 +78,8 @@ struct card* card_new(enum faction faction,
   card->flavor = g_strdup(flavor);
   card->illustrator = g_strdup(illustrator);
 
-  card->cost = NULL;
+  card->cost_is_x = FALSE;
+  card->cost = -1;
   card->agenda_points = -1;
   card->influence_cost = card_is_neutral(card) ? 0 : -1;
   card->trash_cost = -1;
@@ -144,17 +145,9 @@ struct card* card_fill_runner_id(struct card *card,
   return NULL;
 }
 
-/* Either "X" or totally composed of digits. */
-static gboolean is_valid_cost(const gchar *cost) {
-  if (strcmp(cost, "X") == 0) return TRUE;
-  for (int i = 0; cost[i] != '\0'; i++) {
-    if (!g_ascii_isdigit(cost[i])) return FALSE;
-  }
-  return TRUE;
-}
-
 struct card* card_fill_costed(struct card *card,
-                              const gchar *cost,
+                              gboolean cost_is_x,
+                              gint8 cost,
                               gint8 influence_cost) {
   if (card_is_runner(card)) {
     if (card->type != RUNNER_EVENT
@@ -178,9 +171,10 @@ struct card* card_fill_costed(struct card *card,
       goto err;
     }
   }
-  if (cost == NULL || !is_valid_cost(cost)) {
+  if (!cost_is_x && cost < 0) {
     load_error_card
-      (card, "Invalid cost, must be a positive integer or \"X\", got %s", cost);
+      (card, "Invalid cost, need a positive integer or cost_is_x set, got %d",
+       cost);
     goto err;
   }
   if (card_is_neutral(card)) {
@@ -199,8 +193,8 @@ struct card* card_fill_costed(struct card *card,
     }
   }
 
-  if (card->cost != NULL) g_free(card->cost);
-  card->cost = g_strdup(cost);
+  card->cost_is_x = cost_is_x;
+  card->cost = cost;
   card->influence_cost = influence_cost;
   return card;
 
@@ -210,7 +204,7 @@ struct card* card_fill_costed(struct card *card,
 }
 
 struct card* card_fill_program(struct card *card,
-                               const gchar *cost,
+                               gint8 cost,
                                gint8 influence_cost,
                                gint8 memory_cost) {
   if (!card_is_runner(card)) {
@@ -228,14 +222,14 @@ struct card* card_fill_program(struct card *card,
   };
 
   card->memory_cost = memory_cost;
-  return card_fill_costed(card, cost, influence_cost);
+  return card_fill_costed(card, FALSE, cost, influence_cost);
  err:
   card_free(card);
   return NULL;
 }
 
 struct card* card_fill_icebreaker(struct card *card,
-                                  const gchar *cost,
+                                  gint8 cost,
                                   gint8 influence_cost,
                                   gint8 memory_cost,
                                   gint8 strength) {
@@ -274,7 +268,7 @@ struct card* card_fill_corp_id(struct card *card,
 }
 
 struct card* card_fill_agenda(struct card *card,
-                              const gchar *cost,
+                              gint8 cost,
                               gint8 agenda_points) {
   if (!card_is_corp(card)) {
     load_error_card(card, "Must belong to a corp faction");
@@ -284,12 +278,9 @@ struct card* card_fill_agenda(struct card *card,
     load_error_card(card, "Must have type \"Agenda\"");
     goto err;
   }
-  errno = 0;
-  char* end;
-  gint64 i_cost = g_ascii_strtoll(cost, &end, 10);
-  if (errno != 0 || i_cost <= 0 || *end != '\0') {
+  if (cost <= 0) {
     load_error_card(card,
-                    "Agenda costs must be a positive number, got %s", cost);
+                    "Agenda costs must be a positive number, got %d", cost);
     goto err;
   }
   if (agenda_points <= 0) {
@@ -298,8 +289,8 @@ struct card* card_fill_agenda(struct card *card,
                     agenda_points);
   }
 
-  if (card->cost != NULL) g_free(card->cost);
-  card->cost = g_strdup(cost);
+  card->cost_is_x = FALSE;
+  card->cost = cost;
   card->agenda_points = agenda_points;
   return card;
  err:
@@ -308,7 +299,7 @@ struct card* card_fill_agenda(struct card *card,
 }
 
 struct card* card_fill_asset_upgrade(struct card *card,
-                                     const gchar *cost,
+                                     gint8 cost,
                                      gint8 influence_cost,
                                      gint8 trash_cost) {
   if (!card_is_corp(card)) {
@@ -326,14 +317,14 @@ struct card* card_fill_asset_upgrade(struct card *card,
   }
 
   card->trash_cost = trash_cost;
-  return card_fill_costed(card, cost, influence_cost);
+  return card_fill_costed(card, FALSE, cost, influence_cost);
  err:
   card_free(card);
   return NULL;
 }
 
 struct card* card_fill_ice(struct card *card,
-                           const gchar *cost,
+                           gint8 cost,
                            gint8 influence_cost,
                            gint8 strength) {
   if (!card_is_corp(card)) {
@@ -346,7 +337,7 @@ struct card* card_fill_ice(struct card *card,
   }
 
   card->strength = strength;
-  return card_fill_costed(card, cost, influence_cost);
+  return card_fill_costed(card, FALSE, cost, influence_cost);
  err:
   card_free(card);
   return NULL;
@@ -359,7 +350,6 @@ void card_free(struct card *card) {
   g_free(card->text);
   g_free(card->flavor);
   g_free(card->illustrator);
-  g_free(card->cost);
   g_slice_free(struct card, card);
 }
 
@@ -430,5 +420,5 @@ gboolean card_has_trash_cost(const struct card *card) {
 }
 
 gchar* card_render_name(const struct card *card) {
-  return g_strdup_printf("%s%s", card->unique ? "\u25c6 " : "", card->name);
+  return g_markup_printf_escaped("%s%s", card->unique ? "\u25c6 " : "", card->name);
 }

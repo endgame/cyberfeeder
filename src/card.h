@@ -66,9 +66,9 @@ struct card {
   gchar *flavor; /* May be NULL */
   gchar *illustrator; /* May be NULL (Corp IDs) */
 
-  gchar* cost; /* Rez cost for assets/upgrades/ice; advance cost for
-                  agendas. String, because "X" is a valid cost
-                  (Psychographics) */
+  gboolean cost_is_x; /* For e.g., Psychographics */
+  gint8 cost; /* Rez cost for assets/upgrades/ice; advance cost for
+                 agendas. */
   gint8 agenda_points; /* Agendas only */
   gint8 influence_cost; /* == 0 for agendas/neutral */
   gint8 trash_cost; /* Assets/upgrades only */
@@ -99,14 +99,15 @@ struct card* card_fill_runner_id(struct card *card,
                                  gint8 base_link);
 /* For events, hardware, resources and operations. */
 struct card* card_fill_costed(struct card *card,
-                              const gchar *cost,
+                              gboolean cost_is_x,
+                              gint8 cost,
                               gint8 influence_cost);
 struct card* card_fill_program(struct card *card,
-                               const gchar *cost,
+                               gint8 cost,
                                gint8 influence_cost,
                                gint8 memory_cost);
 struct card* card_fill_icebreaker(struct card *card,
-                                  const gchar *cost,
+                                  gint8 cost,
                                   gint8 influence_cost,
                                   gint8 memory_cost,
                                   gint8 strength);
@@ -114,14 +115,14 @@ struct card* card_fill_corp_id(struct card *card,
                                gint8 min_decksize,
                                gint8 max_influence);
 struct card* card_fill_agenda(struct card *card,
-                              const gchar *cost,
+                              gint8 cost,
                               gint8 agenda_points);
 struct card* card_fill_asset_upgrade(struct card *card,
-                                     const gchar *cost,
+                                     gint8 cost,
                                      gint8 influence_cost,
                                      gint8 trash_cost);
 struct card* card_fill_ice(struct card *card,
-                           const gchar *cost,
+                           gint8 cost,
                            gint8 influence_cost,
                            gint8 strength);
 

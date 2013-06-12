@@ -68,26 +68,34 @@ static struct card* fill_card(struct card *card, json_t *j_card) {
   for (p = field_table; p->field != NULL; p++) {
     if (!p->predicate(card)) continue;
     json_t *json_obj = json_object_get_checked(j_card, p->field, JSON_INTEGER);
-    if (json_obj == NULL) return NULL;
+    if (json_obj == NULL) goto err;
     *p->p_int = json_integer_value(json_obj);
   }
 
   /* Handle cost separately; "X" is a valid cost (Psychographics). */
-  const char *cost = NULL;
-  char cost_buf[3]; /* Like they'll ever print a card with triple-digit cost. */
+  gboolean cost_is_x = FALSE;
+  gint8 cost = -1;
   if (card_has_cost(card)) {
     json_t *j_cost = json_object_get(j_card, "cost");
+    if (j_cost == NULL) {
+      load_error(".cost: Field missing");
+      goto err;
+    }
+
     if (json_is_integer(j_cost)) {
-      guint count = g_snprintf(cost_buf,
-                               sizeof(cost_buf),
-                               "%" JSON_INTEGER_FORMAT,
-                               json_integer_value(j_cost));
-      g_assert(count < sizeof(cost_buf));
-      cost = cost_buf;
+      cost = json_integer_value(j_cost);
     } else if (json_is_string(j_cost)) {
-      cost = json_string_value(j_cost);
+      const char *s_cost = json_string_value(j_cost);
+      if (strcmp("X", s_cost) == 0) {
+        cost_is_x = TRUE;
+      } else {
+        load_error(".cost: expected integer or \"X\", got \"%s\"", s_cost);
+        goto err;
+      }
     } else {
-      g_assert_not_reached();
+      load_error(".cost: expected integer or string, got %s",
+                 json_typename(json_typeof(j_cost)));
+      goto err;
     }
   }
 
@@ -100,7 +108,7 @@ static struct card* fill_card(struct card *card, json_t *j_card) {
   case RUNNER_RESOURCE:
   case CORP_OPERATION:
     return card_fill_costed
-      (card, cost, influence_cost);
+      (card, cost_is_x, cost, influence_cost);
   case RUNNER_PROGRAM:
     return card_fill_program
       (card, cost, influence_cost, memory_cost);
@@ -121,7 +129,9 @@ static struct card* fill_card(struct card *card, json_t *j_card) {
     return card_fill_ice
       (card, cost, influence_cost, strength);
   }
-  g_assert_not_reached();
+  err:
+  card_free(card);
+  return NULL;
 }
 
 static struct card* load_card(json_t *j_card, const char *set_name) {

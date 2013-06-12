@@ -153,9 +153,13 @@ void text_buffer_add_card(GtkTextBuffer *buffer,
   }
 
   if (card_has_cost(card)) {
-    gchar *cost = g_strdup_printf("Cost: %s\n", card->cost);
-    gtk_text_buffer_insert(buffer, iter, cost, -1);
-    g_free(cost);
+    if (card->cost_is_x) {
+      gtk_text_buffer_insert(buffer, iter, "Cost: X\n", -1);
+    } else {
+      gchar *cost = g_strdup_printf("Cost: %d\n", card->cost);
+      gtk_text_buffer_insert(buffer, iter, cost, -1);
+      g_free(cost);
+    }
   }
 
   static const struct {
