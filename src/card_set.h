@@ -21,7 +21,6 @@
 #define CARD_SET_H
 
 #include <glib.h>
-#include <string.h>
 
 struct card_set {
   gchar* name;

@@ -46,6 +46,14 @@ int json_object_get_int_default(json_t *obj,
 gchar* json_object_get_string_maybe(json_t *obj,
                                     const char *field);
 
+/* For e.g. "cost" field of cards, where either an integer or the
+   string "X" are both valid. Sets both *i and *is_x, unless there's
+   an error (e.g., missing field), in which case it returns FALSE. */
+gboolean json_object_get_int_or_x(json_t *obj,
+                                  const char *field,
+                                  int *i,
+                                  gboolean *is_x);
+
 const char* json_typename(json_type type);
 
 #endif

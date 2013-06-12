@@ -74,29 +74,9 @@ static struct card* fill_card(struct card *card, json_t *j_card) {
 
   /* Handle cost separately; "X" is a valid cost (Psychographics). */
   gboolean cost_is_x = FALSE;
-  gint8 cost = -1;
+  int cost = -1;
   if (card_has_cost(card)) {
-    json_t *j_cost = json_object_get(j_card, "cost");
-    if (j_cost == NULL) {
-      load_error(".cost: Field missing");
-      goto err;
-    }
-
-    if (json_is_integer(j_cost)) {
-      cost = json_integer_value(j_cost);
-    } else if (json_is_string(j_cost)) {
-      const char *s_cost = json_string_value(j_cost);
-      if (strcmp("X", s_cost) == 0) {
-        cost_is_x = TRUE;
-      } else {
-        load_error(".cost: expected integer or \"X\", got \"%s\"", s_cost);
-        goto err;
-      }
-    } else {
-      load_error(".cost: expected integer or string, got %s",
-                 json_typename(json_typeof(j_cost)));
-      goto err;
-    }
+    if (!json_object_get_int_or_x(j_card, "cost", &cost, &cost_is_x)) goto err;
   }
 
   switch (card->type) {

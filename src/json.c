@@ -21,6 +21,7 @@
 #include "json.h"
 
 #include <glib.h>
+#include <string.h>
 
 #include "load_error.h"
 
@@ -97,6 +98,39 @@ gchar* json_object_get_string_maybe(json_t *obj,
     return NULL;
   }
   return g_strdup(json_string_value(val));
+}
+
+gboolean json_object_get_int_or_x(json_t *obj,
+                                  const char *field,
+                                  int *i,
+                                  gboolean *is_x) {
+  g_assert(json_is_object(obj));
+  json_t *val = json_object_get(obj, field);
+  if (val == NULL) {
+    load_error("%.s: Field missing", field);
+    return FALSE;
+  }
+  if (json_is_integer(val)) {
+    *i = json_integer_value(val);
+    *is_x = FALSE;
+    return TRUE;
+  }
+
+  if (json_is_string(val)) {
+    const char *str = json_string_value(val);
+    if (strcmp("X", str) == 0) {
+      *i = -1;
+      *is_x = TRUE;
+      return TRUE;
+    } else {
+      load_error(".%s: Expected integer or \"X\", got \"%s\"", field, str);
+      return FALSE;
+    }
+  }
+
+  load_error(".%s: Expected integer or \"X\", got \"%s\"",
+             field, json_typename(json_typeof(val)));
+  return FALSE;
 }
 
 const char* json_typename(json_type type) {
