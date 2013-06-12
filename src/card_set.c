@@ -48,7 +48,7 @@ void card_set_free(struct card_set *set) {
 
 static struct card* fill_card(struct card *card, json_t *j_card) {
   gint8 agenda_points, base_link, influence_cost = 0, max_influence,
-    memory_cost, min_decksize, strength, trash_cost;
+    memory_cost, min_decksize, trash_cost;
   const struct {
     const char *field;
     gint8 *p_int;
@@ -60,7 +60,6 @@ static struct card* fill_card(struct card *card, json_t *j_card) {
     { "max_influence" , &max_influence , card_has_max_influence  },
     { "memory_cost"   , &memory_cost   , card_has_memory_cost    },
     { "min_decksize"  , &min_decksize  , card_has_min_decksize   },
-    { "strength"      , &strength      , card_has_strength       },
     { "trash_cost"    , &trash_cost    , card_has_trash_cost     },
     { NULL            , NULL           , NULL                    }
   };
@@ -75,9 +74,16 @@ static struct card* fill_card(struct card *card, json_t *j_card) {
   /* Handle cost separately; "X" is a valid cost (Psychographics). */
   gboolean cost_is_x = FALSE;
   int cost = -1;
-  if (card_has_cost(card)) {
-    if (!json_object_get_int_or_x(j_card, "cost", &cost, &cost_is_x)) goto err;
-  }
+  if (card_has_cost(card)
+      && !json_object_get_int_or_x(j_card, "cost",
+                                   &cost, &cost_is_x)) goto err;
+
+  /* Handle strength separately; "X" is a valid strength (Darwin). */
+  gboolean strength_is_x = FALSE;
+  int strength = -1;
+  if (card_has_strength(card)
+      && !json_object_get_int_or_x(j_card, "strength",
+                                   &strength, &strength_is_x)) goto err;
 
   switch (card->type) {
   case RUNNER_ID:
@@ -94,7 +100,7 @@ static struct card* fill_card(struct card *card, json_t *j_card) {
       (card, cost, influence_cost, memory_cost);
   case RUNNER_ICEBREAKER:
     return card_fill_icebreaker
-      (card, cost, influence_cost, memory_cost, strength);
+      (card, cost, influence_cost, memory_cost, strength_is_x, strength);
   case CORP_ID:
     return card_fill_corp_id
       (card, min_decksize, max_influence);

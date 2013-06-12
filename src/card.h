@@ -73,7 +73,10 @@ struct card {
   gint8 influence_cost; /* == 0 for agendas/neutral */
   gint8 trash_cost; /* Assets/upgrades only */
   gint8 memory_cost; /* Programs only */
+
+  gboolean strength_is_x; /* For e.g., Darwin */
   gint8 strength; /* Ice/icebreakers only */
+
   gint8 min_decksize; /* IDs only */
   gint8 max_influence; /* IDs only */
   gint8 base_link; /* Runner IDs only */
@@ -110,6 +113,7 @@ struct card* card_fill_icebreaker(struct card *card,
                                   gint8 cost,
                                   gint8 influence_cost,
                                   gint8 memory_cost,
+                                  gboolean strength_is_x,
                                   gint8 strength);
 struct card* card_fill_corp_id(struct card *card,
                                gint8 min_decksize,

@@ -84,6 +84,7 @@ struct card* card_new(enum faction faction,
   card->influence_cost = card_is_neutral(card) ? 0 : -1;
   card->trash_cost = -1;
   card->memory_cost = -1;
+  card->strength_is_x = FALSE;
   card->strength = -1;
   card->min_decksize = -1;
   card->max_influence = -1;
@@ -173,7 +174,7 @@ struct card* card_fill_costed(struct card *card,
   }
   if (!cost_is_x && cost < 0) {
     load_error_card
-      (card, "Invalid cost, need a positive integer or cost_is_x set, got %d",
+      (card, "Cost must be a positive integer or cost_is_x set, got %d",
        cost);
     goto err;
   }
@@ -232,16 +233,20 @@ struct card* card_fill_icebreaker(struct card *card,
                                   gint8 cost,
                                   gint8 influence_cost,
                                   gint8 memory_cost,
+                                  gboolean strength_is_x,
                                   gint8 strength) {
   if (card->type != RUNNER_ICEBREAKER) {
     load_error_card(card, "Must be a \"Program: Icebreaker\" card");
     goto err;
   }
-  if (strength < 0) {
-    load_error_card(card, "Strength must be non-negative, got %d", strength);
+  if (!strength_is_x && strength < 0) {
+    load_error_card
+      (card, "Strength must be a positive integer or strength_is_x set, got %d",
+       strength);
     goto err;
   }
 
+  card->strength_is_x = strength_is_x;
   card->strength = strength;
   return card_fill_program(card, cost, influence_cost, memory_cost);
  err:
@@ -336,6 +341,7 @@ struct card* card_fill_ice(struct card *card,
     goto err;
   }
 
+  card->strength_is_x = FALSE;
   card->strength = strength;
   return card_fill_costed(card, FALSE, cost, influence_cost);
  err:

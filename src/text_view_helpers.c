@@ -175,7 +175,6 @@ void text_buffer_add_card(GtkTextBuffer *buffer,
     FIELD("Influence Cost", influence_cost),
     FIELD("Trash Cost", trash_cost),
     FIELD("Memory Cost", memory_cost),
-    FIELD("Strength", strength),
 #undef FIELD
     { NULL, -1, NULL }
   };
@@ -187,6 +186,16 @@ void text_buffer_add_card(GtkTextBuffer *buffer,
                                   *((gint8*)card + p->off));
     gtk_text_buffer_insert(buffer, iter, line, -1);
     g_free(line);
+  }
+
+  if (card_has_strength(card)) {
+    if (card->strength_is_x) {
+      gtk_text_buffer_insert(buffer, iter, "Strength: X\n", -1);
+    } else {
+      gchar *strength = g_strdup_printf("Strength: %d\n", card->strength);
+      gtk_text_buffer_insert(buffer, iter, strength, -1);
+      g_free(strength);
+    }
   }
 
   gtk_text_buffer_insert(buffer, iter, "\n", -1);
