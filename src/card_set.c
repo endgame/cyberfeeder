@@ -231,7 +231,6 @@ struct card_set* card_set_load_file(const gchar *path) {
   gsize n = json_array_size(j_cards);
 
   struct card_set* set = card_set_new(set_name);
-  g_message("Loading set: %s", set_name);
   gchar *basename = g_path_get_basename(path);
   load_error_push_source("%s: .cards", basename);
   g_free(basename);

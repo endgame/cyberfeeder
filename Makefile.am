@@ -37,7 +37,9 @@ cyberfeeder_SOURCES = \
 	src/pages/the_toolbox.c \
 	src/pages/tmi.c \
 	src/text_view_helpers.c \
-	src/text_view_helpers.h
+	src/text_view_helpers.h \
+	src/widget_helpers.c \
+	src/widget_helpers.h
 
 .gperf.c:
 	$(AM_V_GEN)$(GPERF) $< > $@

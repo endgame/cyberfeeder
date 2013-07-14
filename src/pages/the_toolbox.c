@@ -24,6 +24,7 @@
 #include "card_db.h"
 #include "card_set.h"
 #include "text_view_helpers.h"
+#include "widget_helpers.h"
 
 extern struct card_db *DB;
 
@@ -139,13 +140,7 @@ static GtkWidget* setup_card_list_pane(GtkTextBuffer *text_buffer) {
   gtk_tree_model_get_iter_first(GTK_TREE_MODEL(store), &iter);
   gtk_tree_selection_select_iter(sel, &iter);
 
-  GtkWidget *scroller = gtk_scrolled_window_new(NULL, NULL);
-  gtk_container_add(GTK_CONTAINER(scroller), tree_view);
-
-  GtkWidget *frame = gtk_frame_new(NULL);
-  gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
-  gtk_container_add(GTK_CONTAINER(frame), scroller);
-  return frame;
+  return widget_wrap_frame(widget_wrap_scroller(tree_view));
 }
 
 GtkWidget* the_toolbox(void) {

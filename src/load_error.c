@@ -23,6 +23,7 @@
 #include <gtk/gtk.h>
 
 #include "card.h"
+#include "widget_helpers.h"
 
 static GPtrArray /* of gchar*, owned */ *errors = NULL;
 static GQueue /* of gchar*, owned */ sources = G_QUEUE_INIT;
@@ -104,14 +105,8 @@ void load_error_show(void) {
                                              NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
 
-  GtkWidget *scroller = gtk_scrolled_window_new(NULL, NULL);
-  gtk_container_add(GTK_CONTAINER(scroller), tree_view);
-
-  GtkWidget *frame = gtk_frame_new(NULL);
-  gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
-  gtk_container_add(GTK_CONTAINER(frame), scroller);
-
   GtkWidget *content = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+  GtkWidget *frame = widget_wrap_frame(widget_wrap_scroller(tree_view));
   gtk_box_pack_start(GTK_BOX(content), frame, TRUE, TRUE, 0);
   gtk_widget_set_size_request(content, 450, -1);
 
