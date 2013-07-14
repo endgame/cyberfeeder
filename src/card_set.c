@@ -232,7 +232,10 @@ struct card_set* card_set_load_file(const gchar *path) {
 
   struct card_set* set = card_set_new(set_name);
   g_message("Loading set: %s", set_name);
-  load_error_push_source(".cards");
+  gchar *basename = g_path_get_basename(path);
+  load_error_push_source("%s: .cards", basename);
+  g_free(basename);
+
   for (uint i = 0; i < n; i++) {
     json_t *j_card = json_array_get_checked(j_cards, i, JSON_OBJECT);
     if (j_card == NULL) continue;

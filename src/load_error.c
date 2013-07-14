@@ -20,6 +20,8 @@
 #endif
 #include "load_error.h"
 
+#include <gtk/gtk.h>
+
 #include "card.h"
 
 static GPtrArray /* of gchar*, owned */ *errors = NULL;
@@ -80,10 +82,42 @@ void load_error_card(const struct card *card,
 void load_error_show(void) {
   if (errors == NULL) return;
 
-  /* TODO: As a dialog */
+  GtkWidget *dialog =
+    gtk_dialog_new_with_buttons("Load Errors",
+                                NULL,
+                                GTK_DIALOG_MODAL,
+                                GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
+                                NULL);
+
+  GtkListStore *store = gtk_list_store_new(1, G_TYPE_STRING);
+  GtkTreeIter iter;
   for (guint i = 0; i < errors->len; i++) {
-    puts(g_ptr_array_index(errors, i));
+    gtk_list_store_append(store, &iter);
+    gtk_list_store_set(store, &iter, 0, g_ptr_array_index(errors, i), -1);
   }
+  GtkWidget *tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+  g_object_unref(store);
+  GtkTreeViewColumn *column =
+    gtk_tree_view_column_new_with_attributes("Message",
+                                             gtk_cell_renderer_text_new(),
+                                             "text", 0,
+                                             NULL);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
+
+  GtkWidget *scroller = gtk_scrolled_window_new(NULL, NULL);
+  gtk_container_add(GTK_CONTAINER(scroller), tree_view);
+
+  GtkWidget *frame = gtk_frame_new(NULL);
+  gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
+  gtk_container_add(GTK_CONTAINER(frame), scroller);
+
+  GtkWidget *content = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+  gtk_box_pack_start(GTK_BOX(content), frame, TRUE, TRUE, 0);
+  gtk_widget_set_size_request(content, 450, -1);
+
+  gtk_widget_show_all(frame);
+  gtk_dialog_run(GTK_DIALOG(dialog));
+  gtk_widget_destroy(dialog);
 
   g_ptr_array_free(errors, TRUE);
   errors = NULL;
