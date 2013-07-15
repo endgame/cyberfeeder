@@ -25,7 +25,9 @@
 struct card_set;
 
 struct card_db {
-  GPtrArray* /* of struct card_set*, owned */ sets;
+  GPtrArray /* of struct card_set*, owned */ *sets;
+  GHashTable /* of const char*, not owned
+                -> struct card*, not owned */ *all_cards;
 };
 
 struct card_db* card_db_new(void);

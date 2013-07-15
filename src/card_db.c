@@ -28,12 +28,14 @@ static void free_set(gpointer p) { card_set_free(p); }
 struct card_db* card_db_new(void) {
   struct card_db *db = g_slice_new(struct card_db);
   db->sets = g_ptr_array_new_with_free_func(free_set);
+  db->all_cards = g_hash_table_new(g_str_hash, g_str_equal);
   return db;
 }
 
 void card_db_free(struct card_db *db) {
   if (db == NULL) return;
   g_ptr_array_free(db->sets, TRUE);
+  g_hash_table_unref(db->all_cards);
   g_slice_free(struct card_db, db);
 }
 
@@ -41,4 +43,9 @@ void card_db_add_set(struct card_db *db, struct card_set *set) {
   g_assert(db != NULL);
   g_assert(set != NULL);
   g_ptr_array_add(db->sets, set);
+
+  for (guint i = 0; i < set->cards->len; i++) {
+    struct card *card = g_ptr_array_index(set->cards, i);
+    g_hash_table_insert(db->all_cards, card->name, card);
+  }
 }
