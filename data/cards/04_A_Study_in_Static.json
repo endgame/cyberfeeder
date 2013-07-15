@@ -45,7 +45,7 @@
 
      {"name": "Crescentus",
       "number": 65,
-      "faction": "shaper",
+      "faction": "criminal",
       "type": "Program",
       "cost": 1,
       "memory_cost": 1,
