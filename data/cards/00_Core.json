@@ -207,7 +207,7 @@
       "type": "Event: Run - Sabotage",
       "cost": 0,
       "influence_cost": 4,
-      "text": "Make a run on HQ. If successful, instead of accessing cards you may force the Corp to lost up to 5[Credits], then you gain 2[Credits] for each credit lost and take 2 tags.",
+      "text": "Make a run on HQ. If successful, instead of accessing cards you may force the Corp to lose up to 5[Credits], then you gain 2[Credits] for each credit lost and take 2 tags.",
       "illustrator": "Outland Entertainment LLC"},
 
      {"name": "Easy Mark",
