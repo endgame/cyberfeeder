@@ -53,7 +53,7 @@ enum card_type {
 
 struct card {
   gchar *name;
-  const gchar *set; /* Not owned. Held by struct card_db */
+  const gchar *set; /* Not owned. Held by struct card_set */
   gint8 number; /* Noise = 1, Deja Vu = 2, ... */
   gint8 quantity; /* == 3, except for certain Core cards */
 
