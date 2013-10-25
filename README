@@ -5,3 +5,5 @@ Currently it's just a card list and it's a couple of packs out of date.
 
 Bootstrap the project by running `autoconf -i`, then `./configure`,
 then `make`, then `./cyberfeeder --data-dir data`.
+
+You will need autoconf, automake, gperf, gtk+3 and jansson.
