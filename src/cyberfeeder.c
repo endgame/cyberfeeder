@@ -32,18 +32,14 @@ struct card_db *DB = NULL;
 gchar *DATA_DIR = NULL;
 
 static void read_db(void) {
-  gchar *card_dir = g_build_filename(DATA_DIR, "cards", NULL);
-  GPtrArray *files = dir_list_json(card_dir);
-  if (files == NULL) return;
-
   DB = card_db_new();
-  for (guint i = 0; i < files->len; i++) {
-    gchar *file = g_build_filename(card_dir, g_ptr_array_index(files, i), NULL);
+
+  gchar *card_dir = g_build_filename(DATA_DIR, "cards", NULL);
+  void add_card_set(const char *file, gpointer db) {
     struct card_set *set = card_set_load_file(file);
-    if (set != NULL) card_db_add_set(DB, set);
-    g_free(file);
+    if (set != NULL) card_db_add_set(db, set);
   }
-  g_ptr_array_free(files, TRUE);
+  dir_json_foreach(card_dir, add_card_set, DB);
   g_free(card_dir);
 }
 
@@ -64,7 +60,9 @@ int main(int argc, char *argv[]) {
 
   read_db();
   load_error_show();
-  if (DB == NULL) {
+  if (DB->sets->len == 0) {
+    card_db_free(DB);
+    DB = NULL;
     GtkWidget *dialog = gtk_message_dialog_new(NULL,
                                                GTK_DIALOG_MODAL,
                                                GTK_MESSAGE_ERROR,

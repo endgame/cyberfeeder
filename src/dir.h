@@ -25,4 +25,9 @@
 /* Returns a sorted list. */
 GPtrArray* /* of gchar*, owned */ dir_list_json(const char *path);
 
+typedef void (*dir_json_func)(const char *file, gpointer data);
+
+/* Call func(file, data) for each file in path. */
+void dir_json_foreach(const char *dir, dir_json_func func, gpointer data);
+
 #endif

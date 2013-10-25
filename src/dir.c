@@ -48,3 +48,13 @@ GPtrArray* dir_list_json(const char *path) {
 
   return rv;
 }
+
+void dir_json_foreach(const char *dir, dir_json_func func, gpointer data) {
+  GPtrArray *files = dir_list_json(dir);
+  for (guint i = 0; i < files->len; i++) {
+    gchar *file = g_build_filename(dir, g_ptr_array_index(files, i), NULL);
+    func(file, data);
+    g_free(file);
+  }
+  g_ptr_array_free(files, TRUE);
+}
